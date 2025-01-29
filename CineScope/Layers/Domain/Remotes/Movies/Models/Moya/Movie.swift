@@ -24,7 +24,7 @@ struct Movie: Decodable {
 
 
 // MARK: - MoviesResponse
-struct MoviesResponse: Decodable {
+struct MovieResponse: Decodable {
     let results: [Movie]
 }
 
