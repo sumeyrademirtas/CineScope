@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		815973802D4A659400B5ED20 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 8159737F2D4A659400B5ED20 /* Moya */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		815973512D4A5F5500B5ED20 /* CineScope.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CineScope.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				815973802D4A659400B5ED20 /* Moya in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +83,7 @@
 			);
 			name = CineScope;
 			packageProductDependencies = (
+				8159737F2D4A659400B5ED20 /* Moya */,
 			);
 			productName = CineScope;
 			productReference = 815973512D4A5F5500B5ED20 /* CineScope.app */;
@@ -107,6 +113,9 @@
 			);
 			mainGroup = 815973482D4A5F5500B5ED20;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				8159737E2D4A659400B5ED20 /* XCRemoteSwiftPackageReference "Moya" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 815973522D4A5F5500B5ED20 /* Products */;
 			projectDirPath = "";
@@ -335,6 +344,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		8159737E2D4A659400B5ED20 /* XCRemoteSwiftPackageReference "Moya" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Moya/Moya.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 15.0.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8159737F2D4A659400B5ED20 /* Moya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8159737E2D4A659400B5ED20 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = Moya;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 815973492D4A5F5500B5ED20 /* Project object */;
 }
