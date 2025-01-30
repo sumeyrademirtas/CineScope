@@ -17,7 +17,7 @@ protocol MovieService {
 }
 
 struct MovieServiceImpl: MovieService {
-    // BaseMoyaProvider kullanilarak Tmdb Api istekleri yonetiliyor.
+    // BaseMoyaProvider kullanilarak MovieApi istekleri yonetiliyor.
     // NetworkLoggerPlugin ile HTTP istek ve yanitlari loglaniyor(console)
     // formatter ile JSON yanitlari okunabilir hale geliyor.
     // logOptions: .verbose istek ve yanitlari ayrintili olarak logluyor. verbose yerine baska secenekler de var.
@@ -32,7 +32,7 @@ struct MovieServiceImpl: MovieService {
 extension MovieServiceImpl {
     func getPopularMovies(api: MovieApi) -> AnyPublisher<MovieResponse?, any Error>? {
         return Future { promise in
-            provider.request(api) { result in // Burada TmdbApi enum inin path ozelligine gore istek yapiyor.
+            provider.request(api) { result in // Burada MovieApi enum inin path ozelligine gore istek yapiyor.
                 switch result {
                 case .success(let response):
                     do {
@@ -61,18 +61,17 @@ extension MovieServiceImpl {
                 switch result {
                 case .success(let response):
                     do {
-                        // JSON verisini decode et ve unwrap yap
                         let decodedResponse = try JSONDecoder().decode(MovieResponse.self, from: response.data)
-                        promise(.success(decodedResponse)) // Başarıyla promise gönder
+                        promise(.success(decodedResponse))
                     } catch {
-                        promise(.failure(error)) // JSON decode hatası
+                        promise(.failure(error))
                     }
                 case .failure(let moyaError):
                     switch moyaError {
                     case .underlying(let error, _):
-                        promise(.failure(error)) // Ağ hatası
+                        promise(.failure(error))
                     default:
-                        promise(.failure(moyaError)) // Diğer Moya hataları
+                        promise(.failure(moyaError))
                     }
                 }
             }
@@ -86,18 +85,17 @@ extension MovieServiceImpl {
                 switch result {
                 case .success(let response):
                     do {
-                        // JSON verisini decode et ve unwrap yap
                         let decodedResponse = try JSONDecoder().decode(MovieResponse.self, from: response.data)
-                        promise(.success(decodedResponse)) // Başarıyla promise gönder
+                        promise(.success(decodedResponse))
                     } catch {
-                        promise(.failure(error)) // JSON decode hatası
+                        promise(.failure(error))
                     }
                 case .failure(let moyaError):
                     switch moyaError {
                     case .underlying(let error, _):
-                        promise(.failure(error)) // Ağ hatası
+                        promise(.failure(error))
                     default:
-                        promise(.failure(moyaError)) // Diğer Moya hataları
+                        promise(.failure(moyaError))
                     }
                 }
             }
@@ -111,18 +109,17 @@ extension MovieServiceImpl {
                 switch result {
                 case .success(let response):
                     do {
-                        // JSON verisini decode et ve unwrap yap
                         let decodedResponse = try JSONDecoder().decode(MovieResponse.self, from: response.data)
-                        promise(.success(decodedResponse)) // Başarıyla promise gönder
+                        promise(.success(decodedResponse))
                     } catch {
-                        promise(.failure(error)) // JSON decode hatası
+                        promise(.failure(error))
                     }
                 case .failure(let moyaError):
                     switch moyaError {
                     case .underlying(let error, _):
-                        promise(.failure(error)) // Ağ hatası
+                        promise(.failure(error))
                     default:
-                        promise(.failure(moyaError)) // Diğer Moya hataları
+                        promise(.failure(moyaError))
                     }
                 }
             }
