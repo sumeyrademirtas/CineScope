@@ -39,7 +39,7 @@ extension MovieApi: TargetType { //TargetType Moya Provider in protokolu. Bu pro
     }
     
     var method: Moya.Method {
-        return .get // Benim kullandigim TMDB Apileri GET istegi kullaniyor.
+        return .get // Benim kullandigim TMDB Apiler GET istegi kullaniyor.
     }
     
     var task: Moya.Task {
