@@ -8,14 +8,14 @@
 import Foundation
 import Moya
 
-enum TmdbApi {
+enum MovieApi {
     case getPopularMovies(page: Int)
     case getTopRatedMovies(page: Int)
     case getNowPlayingMovies(page: Int)
     case getUpcomingMovies(page: Int)
 }
 
-extension TmdbApi: TargetType { //TargetType Moya Provider in protokolu. Bu protocol baseURL, path, method, task. headers i getiriyor.
+extension MovieApi: TargetType { //TargetType Moya Provider in protokolu. Bu protocol baseURL, path, method, task. headers i getiriyor.
     
     private var constants: ApiConstants {
         return ApiConstants()
@@ -48,11 +48,11 @@ extension TmdbApi: TargetType { //TargetType Moya Provider in protokolu. Bu prot
                 .getNowPlayingMovies(page: let page),
                 .getTopRatedMovies(page: let page),
                 .getUpcomingMovies(page: let page):
-            var parameters: [String: Any] = [:]
-            parameters["api_key"] = constants.apiKey
-            parameters["page"] = page
-            parameters["language"] = "en-US"
-            return .requestParameters(parameters: parameters, encoding: URLEncoding.default)
+            var params: [String: Any] = [:]
+            params["api_key"] = constants.apiKey
+            params["page"] = page
+            params["language"] = "en-US"
+            return .requestParameters(parameters: params, encoding: URLEncoding.default)
         }
     }
     

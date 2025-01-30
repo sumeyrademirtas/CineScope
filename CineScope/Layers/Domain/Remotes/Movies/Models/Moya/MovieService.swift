@@ -9,19 +9,19 @@ import Combine
 import Foundation
 import Moya
 
-protocol TmdbService {
-    func getPopularMovies(api: TmdbApi) -> AnyPublisher<MovieResponse?, Error>?
-    func getUpcomingMovies(api: TmdbApi) -> AnyPublisher<MovieResponse?, Error>?
-    func getNowPlayingMovies(api: TmdbApi) -> AnyPublisher<MovieResponse?, Error>?
-    func getTopRatedMovies(api: TmdbApi) -> AnyPublisher<MovieResponse?, Error>?
+protocol MovieService {
+    func getPopularMovies(api: MovieApi) -> AnyPublisher<MovieResponse?, Error>?
+    func getUpcomingMovies(api: MovieApi) -> AnyPublisher<MovieResponse?, Error>?
+    func getNowPlayingMovies(api: MovieApi) -> AnyPublisher<MovieResponse?, Error>?
+    func getTopRatedMovies(api: MovieApi) -> AnyPublisher<MovieResponse?, Error>?
 }
 
-struct TmdbServiceImpl: TmdbService {
+struct MovieServiceImpl: MovieService {
     // BaseMoyaProvider kullanilarak Tmdb Api istekleri yonetiliyor.
     // NetworkLoggerPlugin ile HTTP istek ve yanitlari loglaniyor(console)
     // formatter ile JSON yanitlari okunabilir hale geliyor.
     // logOptions: .verbose istek ve yanitlari ayrintili olarak logluyor. verbose yerine baska secenekler de var.
-    let provider = BaseMoyaProvider<TmdbApi>(
+    let provider = BaseMoyaProvider<MovieApi>(
         plugins: [NetworkLoggerPlugin(configuration: .init(
             formatter: .init(responseData: JSONResponseDataFormatter),
             logOptions: .verbose
@@ -29,8 +29,8 @@ struct TmdbServiceImpl: TmdbService {
     )
 }
 
-extension TmdbServiceImpl {
-    func getPopularMovies(api: TmdbApi) -> AnyPublisher<MovieResponse?, any Error>? {
+extension MovieServiceImpl {
+    func getPopularMovies(api: MovieApi) -> AnyPublisher<MovieResponse?, any Error>? {
         return Future { promise in
             provider.request(api) { result in // Burada TmdbApi enum inin path ozelligine gore istek yapiyor.
                 switch result {
@@ -55,7 +55,7 @@ extension TmdbServiceImpl {
         .eraseToAnyPublisher()
     }
 
-    func getUpcomingMovies(api: TmdbApi) -> AnyPublisher<MovieResponse?, any Error>? {
+    func getUpcomingMovies(api: MovieApi) -> AnyPublisher<MovieResponse?, any Error>? {
         return Future { promise in
             provider.request(api) { result in
                 switch result {
@@ -80,7 +80,7 @@ extension TmdbServiceImpl {
         .eraseToAnyPublisher()
     }
 
-    func getNowPlayingMovies(api: TmdbApi) -> AnyPublisher<MovieResponse?, any Error>? {
+    func getNowPlayingMovies(api: MovieApi) -> AnyPublisher<MovieResponse?, any Error>? {
         return Future { promise in
             provider.request(api) { result in
                 switch result {
@@ -105,7 +105,7 @@ extension TmdbServiceImpl {
         .eraseToAnyPublisher()
     }
 
-    func getTopRatedMovies(api: TmdbApi) -> AnyPublisher<MovieResponse?, any Error>? {
+    func getTopRatedMovies(api: MovieApi) -> AnyPublisher<MovieResponse?, any Error>? {
         return Future { promise in
             provider.request(api) { result in
                 switch result {
