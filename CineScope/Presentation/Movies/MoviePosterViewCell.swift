@@ -10,6 +10,8 @@ import UIKit
 
 class MoviePosterViewCell: UICollectionViewCell {
     
+    static let reuseIdentifier = "MoviePosterViewCell"
+    
     // MARK: - Properties
     private let posterImageView: UIImageView = {
         let imageView = UIImageView()
