@@ -23,12 +23,12 @@ final class MovieVMImpl: MovieVM {
     private var useCase: MovieUseCase? // UseCase, Api cagrilari icin kullanilacak.
     
     // DataStorage
-    private var categorySections: [MovieCategory: [SectionType]] = [:] // MARK: SOR
-    private var sections: [SectionType] = []
-    private var movies: [Movie] = []
+    private var categorySections: [MovieCategory: [SectionType]] = [:] // Her bir kategoriye ait SectionType listesi tutabilir.
+    private var sections: [SectionType] = [] // Tum SectionType larin bir listesi.
+    private var movies: [Movie] = [] // Filmlerin listesi.
     
-    // Initialization
-    init(useCase: MovieUseCase){
+    // Initialization // Dependency Injection
+    init(useCase: MovieUseCase){ // Disaridan MovieUseCase i aliyor, test edilebilir moduler yapi olusturuyoruz.
         self.useCase = useCase
     }
 }
@@ -38,35 +38,36 @@ extension MovieVMImpl {
     
     enum MovieVMOutput {
         case isLoading(isShow: Bool) // MARK: - Mahsuna sor. Loading indicator ok, ama nasil kullaniyoruz, ekranda nasil goruyoruz.
-        case sectionUpdated(category: MovieCategory, section: [SectionType]) // MARK: Mahsuna sor.
+        case sectionUpdated(category: MovieCategory, section: [SectionType]) // MARK: Mahsuna sor. // Kategoriye yeni veriler geldiginde.
         case errorOccured(message: String)
-        case dataSource(section: [SectionType]) // MARK: Mahsuna sor. Burasinin title i titleDataSource olarak degistirilebilir. dur ya cok da emin degilim.
+        case dataSource(section: [SectionType]) // MARK: Mahsuna sor. Burasinin ismi titleDataSource olarak degistirilebilir. dur ya cok da emin degilim. ya da ayrica titleDataSource icin bir case mi ayarlamak lazim?
     }
     
     enum MovieVMInput {
-        case start(categories: [MovieCategory], page: Int) // MARK: - Mahsuna sor. O daha farkli yapmis. case kismini da function kismini da
+        case start(categories: [MovieCategory], page: Int) // MARK: - Mahsuna sor. O daha farkli yapmis. start in icine parametre vermemis.
     }
     
-    enum SectionType {
+    enum SectionType { // Kategoriler
         case popular(rows: [RowType])
         case upcoming(rows: [RowType])
         case nowPlaying(rows: [RowType])
         case topRated(rows: [RowType])
     }
     
-    enum RowType {
+    enum RowType { // Her section icindeki filmler icin.
         case movie(movie: [Movie])
     }
 }
 
 // MARK: - Prepare UI
-extension MovieVMImpl {
+extension MovieVMImpl { // MARK: - BU KISMI KOMPLE TEKRAR ET. IYICE ANLA NOT AL.
     private func updateUI(popular: MovieResponse?, upcoming: MovieResponse?, nowPlaying: MovieResponse?, topRated: MovieResponse?) -> [SectionType] {
         
         var sections = [SectionType]()
         var popularRowType = [RowType]()
         var upcomingRowType = [RowType]()
         var nowPlayingRowType = [RowType]()
+        var topRatedRowType = [RowType]()
         
         if let popular = popular?.results {
             popularRowType.append(.movie(movie: popular))
@@ -80,7 +81,7 @@ extension MovieVMImpl {
         
         if let topRated = topRated?.results {
             nowPlayingRowType.append(.movie(movie: topRated))
-            sections.append(.topRated(rows: nowPlayingRowType))
+            sections.append(.topRated(rows: topRatedRowType))
         }
         
         if let upcoming = upcoming?.results {
@@ -96,8 +97,8 @@ extension MovieVMImpl {
 extension MovieVMImpl {
     private func fetchAllMovies(categories: [MovieCategory], page: Int) {
         self.output.send(.isLoading(isShow: true))
-        // MARK: Sor weak self ve guard let self kullanmamistim bir onceki versiyonda. ne farki var arastir.
-        self.useCase?.fetchAllMovies()?.sink(receiveCompletion: { [weak self] completion in
+        self.useCase?.fetchAllMovies()?
+            .sink(receiveCompletion: { [weak self] completion in // (ViewModel) zayıf referans olarak tutulur
             guard let self else { return }
             switch completion {
             case . finished:
@@ -117,12 +118,13 @@ extension MovieVMImpl {
 
 // MARK: - Activity Handler - sink(Combine Publisher dan gelen veriyi dinler)
 extension MovieVMImpl {
+    // Alttaki yapi reaktif programlama prensiplerini kullanarak, ViewModel ile UI arasinda veri akisini ve durum yonetimini saglar. 
     func activityHandler(input: AnyPublisher<MovieVMInput, Never>) -> AnyPublisher<MovieVMOutput, Never> {
         input.sink { [weak self] inputEvent in
         guard let self else { return }
             switch inputEvent {
                 case .start(let categories, let page):
-                self.fetchAllMovies(categories: categories, page: page)
+                self.fetchAllMovies(categories: categories, page: page) // MovieVMImpl icindeki fetchAllMovies i cagiriyor bu sefer.
             }
         }.store(in: &cancellables)
         return output.eraseToAnyPublisher()
