@@ -37,8 +37,8 @@ struct MovieUseCaseImpl: MovieUseCase {
             // Publishers.Zip4 tum istekler tamamlaninca sonuclari tek bir tuple icinde dondurur.
             return Publishers.Zip4(popularPublisher, upcomingPublisher, nowPlayingPublisher, topRatedPublisher)
             // Eğer map kullanmazsak, Zip4’ün sonucu doğrudan tuple olarak dönmez.
-                .map { popular, topRated, nowPlaying, upcoming in
-                    (popular, topRated, nowPlaying, upcoming)
+                .map { popular, upcoming, nowPlaying, topRated in
+                    (popular, upcoming, nowPlaying, topRated)
                 }
                 .eraseToAnyPublisher()
         }
