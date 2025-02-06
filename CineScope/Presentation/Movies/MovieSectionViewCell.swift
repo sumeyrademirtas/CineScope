@@ -45,10 +45,10 @@ class MovieSectionViewCell: UICollectionViewCell {
         innerCollectionView.alwaysBounceHorizontal = true
         
         NSLayoutConstraint.activate([
-            innerCollectionView.topAnchor.constraint(equalTo: topAnchor),
-            innerCollectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            innerCollectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            innerCollectionView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            innerCollectionView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            innerCollectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            innerCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            innerCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
         ])
         innerCollectionView.contentInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
     }
