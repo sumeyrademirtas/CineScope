@@ -48,7 +48,7 @@ extension MovieListProviderImpl {
         input.sink { [weak self] eventType in
             switch eventType {
             case .setupUI(let collectionView):
-                self?.collectionView = collectionView
+                self?.setupCollectionView(collectionView: collectionView)
             case .prepareCollectionView(let data):
                 self?.prepareCollectionView(data: data)
             }
@@ -110,6 +110,42 @@ extension MovieListProviderImpl: UICollectionViewDelegate, UICollectionViewDataS
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 1 // Her Section bir adet MovieSectionCell icerecek
+    }
+    
+    /// Hücre boyutları
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
+        return CGSize(width: collectionView.frame.width, height: 200) // Tüm genişlik + uygun yükseklik SECTION IN YUKSEKLIGI GENISLIGI BURASI.
+    }
+    
+    /// Section kenar boşlukları
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        insetForSectionAt section: Int
+    ) -> UIEdgeInsets {
+        return UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10) // Sol ve sağ boşluk
+    }
+    
+    /// Satır arası boşluk
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        minimumLineSpacingForSectionAt section: Int
+    ) -> CGFloat {
+        return 0 // Satırlar arası boşluk
+    }
+    
+    /// Hücreler arası boşluk
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        minimumInteritemSpacingForSectionAt section: Int
+    ) -> CGFloat {
+        return 0 // Hücreler arası boşluk.
     }
     
     // Hucreyi olusturup yapilandiriyoruz
