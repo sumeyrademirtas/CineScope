@@ -73,6 +73,12 @@ extension MovieVMImpl { // MARK: - BU KISMI KOMPLE TEKRAR ET. IYICE ANLA NOT AL.
             popularRowType.append(.movie(movie: popular))
             sections.append(.popular(rows: popularRowType))
         }
+     
+    
+        if let upcoming = upcoming?.results {
+            upcomingRowType.append(.movie(movie: upcoming))
+            sections.append(.upcoming(rows: upcomingRowType))
+        }
         
         if let nowPlaying = nowPlaying?.results {
             nowPlayingRowType.append(.movie(movie: nowPlaying))
@@ -80,13 +86,8 @@ extension MovieVMImpl { // MARK: - BU KISMI KOMPLE TEKRAR ET. IYICE ANLA NOT AL.
         }
         
         if let topRated = topRated?.results {
-            nowPlayingRowType.append(.movie(movie: topRated))
+            topRatedRowType.append(.movie(movie: topRated))
             sections.append(.topRated(rows: topRatedRowType))
-        }
-        
-        if let upcoming = upcoming?.results {
-            upcomingRowType.append(.movie(movie: upcoming))
-            sections.append(.upcoming(rows: upcomingRowType))
         }
         
         return sections
