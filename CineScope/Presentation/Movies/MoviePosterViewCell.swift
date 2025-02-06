@@ -40,6 +40,7 @@ class MoviePosterViewCell: UICollectionViewCell {
             posterImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
             posterImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             posterImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            posterImageView.heightAnchor.constraint(equalTo: contentView.heightAnchor, multiplier: 1) // bunu eklemeyince boyutlar sapitiyor
             ])
     }
     
