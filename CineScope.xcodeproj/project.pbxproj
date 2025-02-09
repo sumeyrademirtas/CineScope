@@ -8,10 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		815973802D4A659400B5ED20 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 8159737F2D4A659400B5ED20 /* Moya */; };
+		815974AD2D567DEF00B5ED20 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 815974AC2D567DEF00B5ED20 /* Lottie */; };
+		815974B62D5680B300B5ED20 /* progress.json in Resources */ = {isa = PBXBuildFile; fileRef = 815974B52D5680B300B5ED20 /* progress.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		815973512D4A5F5500B5ED20 /* CineScope.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CineScope.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		815974B52D5680B300B5ED20 /* progress.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = progress.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -41,6 +44,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				815973802D4A659400B5ED20 /* Moya in Frameworks */,
+				815974AD2D567DEF00B5ED20 /* Lottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -50,6 +54,7 @@
 		815973482D4A5F5500B5ED20 = {
 			isa = PBXGroup;
 			children = (
+				815974B52D5680B300B5ED20 /* progress.json */,
 				815973532D4A5F5500B5ED20 /* CineScope */,
 				815973522D4A5F5500B5ED20 /* Products */,
 			);
@@ -84,6 +89,7 @@
 			name = CineScope;
 			packageProductDependencies = (
 				8159737F2D4A659400B5ED20 /* Moya */,
+				815974AC2D567DEF00B5ED20 /* Lottie */,
 			);
 			productName = CineScope;
 			productReference = 815973512D4A5F5500B5ED20 /* CineScope.app */;
@@ -115,6 +121,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				8159737E2D4A659400B5ED20 /* XCRemoteSwiftPackageReference "Moya" */,
+				815974AB2D567DEF00B5ED20 /* XCRemoteSwiftPackageReference "lottie-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 815973522D4A5F5500B5ED20 /* Products */;
@@ -131,6 +138,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				815974B62D5680B300B5ED20 /* progress.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -354,6 +362,14 @@
 				minimumVersion = 15.0.3;
 			};
 		};
+		815974AB2D567DEF00B5ED20 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -361,6 +377,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8159737E2D4A659400B5ED20 /* XCRemoteSwiftPackageReference "Moya" */;
 			productName = Moya;
+		};
+		815974AC2D567DEF00B5ED20 /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 815974AB2D567DEF00B5ED20 /* XCRemoteSwiftPackageReference "lottie-ios" */;
+			productName = Lottie;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
