@@ -29,7 +29,7 @@ struct MovieResponse: Decodable {
 }
 
 
-enum MovieCategory: String {    // MARK: - Mahsuna sor. MovieCategory yerine baska bir sekilde daha temiz yapabilir miydik? Bu cok mu sacma olmus?
+enum MovieCategory: String {    // MARK: - Mahsuna sor. iyi dedi
     case nowPlaying = "now_playing"
     case topRated = "top_rated"
     case popular = "popular"
