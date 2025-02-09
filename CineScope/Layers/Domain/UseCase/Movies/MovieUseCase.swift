@@ -11,11 +11,7 @@ import Foundation
 // MARK: - Protocol Definition
 
 protocol MovieUseCase {
-    func fetchAllMovies() -> AnyPublisher<(MovieResponse?, MovieResponse?, MovieResponse?, MovieResponse?), Error>? // MARK: - Mahsuna sor. bu protokolde yoktu aslinda. VM de UseCaseImpl yerine UseCase tanimlayabilmek icin bu func i da protokol icine dahil ettim. uygun mudur
-    func getPopularMovies(api: MovieApi) -> AnyPublisher<MovieResponse?, any Error>?
-    func getUpcomingMovies(api: MovieApi) -> AnyPublisher<MovieResponse?, Error>?
-    func getNowPlayingMovies(api: MovieApi) -> AnyPublisher<MovieResponse?, Error>?
-    func getTopRatedMovies(api: MovieApi) -> AnyPublisher<MovieResponse?, Error>?
+    func fetchAllMovies() -> AnyPublisher<(MovieResponse?, MovieResponse?, MovieResponse?, MovieResponse?), Error>?
 }
 
 struct MovieUseCaseImpl: MovieUseCase {
