@@ -37,14 +37,13 @@ final class MovieVMImpl: MovieVM {
 extension MovieVMImpl {
     
     enum MovieVMOutput {
-        case isLoading(isShow: Bool) // MARK: - Mahsuna sor. Loading indicator ok, ama nasil kullaniyoruz, ekranda nasil goruyoruz.
-        case sectionUpdated(category: MovieCategory, section: [SectionType]) // MARK: Mahsuna sor. // Kategoriye yeni veriler geldiginde.
+        case isLoading(isShow: Bool)
         case errorOccured(message: String)
-        case dataSource(section: [SectionType]) // MARK: Mahsuna sor. Burasinin ismi titleDataSource olarak degistirilebilir. dur ya cok da emin degilim. ya da ayrica titleDataSource icin bir case mi ayarlamak lazim?
+        case dataSource(section: [SectionType])
     }
     
     enum MovieVMInput {
-        case start(categories: [MovieCategory], page: Int) // MARK: - Mahsuna sor. O daha farkli yapmis. start in icine parametre vermemis.
+        case start(categories: [MovieCategory], page: Int)
     }
     
     enum SectionType { // Kategoriler
@@ -60,7 +59,7 @@ extension MovieVMImpl {
 }
 
 // MARK: - Prepare UI
-extension MovieVMImpl { // MARK: - BU KISMI KOMPLE TEKRAR ET. IYICE ANLA NOT AL.
+extension MovieVMImpl { 
     private func updateUI(popular: MovieResponse?, upcoming: MovieResponse?, nowPlaying: MovieResponse?, topRated: MovieResponse?) -> [SectionType] {
         
         var sections = [SectionType]()

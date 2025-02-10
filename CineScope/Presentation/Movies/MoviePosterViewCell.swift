@@ -44,7 +44,7 @@ class MoviePosterViewCell: UICollectionViewCell {
             ])
     }
     
-    override func prepareForReuse() { // MARK: Mahsuna sor. Gerekli mi? Dogru kullandim mi?
+    override func prepareForReuse() { //bunu dene. scroll ettiginde sapitiyo mu bak
         super.prepareForReuse()
         posterImageView.image = nil
     }

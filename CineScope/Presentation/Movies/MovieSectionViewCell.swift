@@ -40,7 +40,7 @@ class MovieSectionViewCell: UICollectionViewCell {
         contentView.addSubview(innerCollectionView)
         innerCollectionView.dataSource = self
         innerCollectionView.delegate = self
-        innerCollectionView.register(MoviePosterViewCell.self, forCellWithReuseIdentifier: MoviePosterViewCell.reuseIdentifier) // MARK:  reuseidentifier vermemistim ben aslinda. nasil anliyor?
+        innerCollectionView.register(MoviePosterViewCell.self, forCellWithReuseIdentifier: MoviePosterViewCell.reuseIdentifier)
         innerCollectionView.backgroundColor = .gray
         innerCollectionView.alwaysBounceHorizontal = true
         
@@ -53,7 +53,7 @@ class MovieSectionViewCell: UICollectionViewCell {
         innerCollectionView.contentInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
     }
     
-    override func prepareForReuse() { // MARK: Mahsuna sor. dogru kullanim mi?
+    override func prepareForReuse() {
         super.prepareForReuse()
         movies = []
         innerCollectionView.reloadData()

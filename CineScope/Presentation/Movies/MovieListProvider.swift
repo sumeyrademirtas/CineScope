@@ -18,7 +18,6 @@ final class MovieListProviderImpl: NSObject, MovieListProvider {
     typealias T = MovieVMImpl.SectionType
     typealias I = IndexPath
     var dataList: [MovieVMImpl.SectionType] = []
-//    var titleDataList: [MovieVMImpl.TitleSectionType] = [] // MARK: Ben bu sekilde yapmadigim icin burayi yorum satirina aldim. title isini farkli sekilde halletmistim. Bunun uzerinde biraz dursam iyi olur.
     
     // Binding
     private let output = PassthroughSubject<MovieListProviderOutput, Never>()
@@ -72,7 +71,6 @@ extension MovieListProviderImpl: UICollectionViewDelegate, UICollectionViewDataS
     }
     
     /// Header View - Section Title Settings
-    // MARK: - Mahsuna sor. Bunu burada yapmamizin bir sakincasi var mi?
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         guard kind == UICollectionView.elementKindSectionHeader else {
             fatalError("Unsupported kind: \(kind)")
@@ -184,10 +182,6 @@ extension MovieListProviderImpl: UICollectionViewDelegate, UICollectionViewDataS
         return cell
     }
     
-    // MARK: Mahsuna sor. PrefetchItems icin func ayarlamadim. Onceligi yok gibi su anlik.
-//    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
-//        <#code#>
-//    }
     
     func reloadCollectionView() {
         DispatchQueue.main.async { [weak self] in

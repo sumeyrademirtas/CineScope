@@ -15,7 +15,7 @@ class MoviesVC: BaseViewController { // FIXME: BaseClass kontrolu yap. BaseClass
     typealias V = MovieVM
     
     // MARK: - Properties
-    private var viewModel: V? // Mahsuna sor. bunlar dogru tanimlamalar mi?
+    private var viewModel: V? 
     private var provider: (any P)?
     
     // Combine binding
