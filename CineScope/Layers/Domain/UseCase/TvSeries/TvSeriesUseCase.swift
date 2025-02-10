@@ -24,7 +24,7 @@ struct TvSeriesUseCaseImpl: TvSeriesUseCase {
     // sira [.airingToday, .onTheAir, .popular, .topRated]
     func fetchAllTvSeries() -> AnyPublisher<(TvSeriesResponse?, TvSeriesResponse?, TvSeriesResponse?, TvSeriesResponse?), Error>? {
         if
-            let airingTodayPublisher = getAiringTodayTvSeries(api: .getPopularTvSeries(page: 1)),
+            let airingTodayPublisher = getAiringTodayTvSeries(api: .getAiringTodayTvSeries(page: 1)),
             let onTheAirPublisher = getOnTheAirTvSeries(api: .getOnTheAirTvSeries(page: 1)),
             let popularPublisher = getPopularTvSeries(api: .getPopularTvSeries(page: 1)),
             let topRatedPublisher = getTopRatedTvSeries(api: .getTopRatedTvSeries(page: 1))
