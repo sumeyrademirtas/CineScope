@@ -15,12 +15,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         
         guard let windowScene = (scene as? UIWindowScene) else { return }
-
-        let builder = MovieBuilderImpl()
-        let viewController = builder.build()
-
+//
+//        let builder = MovieBuilderImpl()
+//        let viewController = builder.build()
+//
+//        let window = UIWindow(windowScene: windowScene)
+//        window.rootViewController = viewController
+        
+        // MainTabBarController'ı oluşturun
+        let tabBarController = MainTabBarController()
+        
         let window = UIWindow(windowScene: windowScene)
-        window.rootViewController = viewController
+        window.rootViewController = tabBarController
+        
         self.window = window
         window.makeKeyAndVisible()
     }
