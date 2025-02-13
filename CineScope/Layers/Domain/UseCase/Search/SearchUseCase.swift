@@ -11,7 +11,7 @@ import Foundation
 // MARK: - Protocol Definition
 
 protocol SearchUseCase {
-    func fetchAllSearchResults() -> AnyPublisher<SearchMovieResponse?, Error>? // FIXME: Ilerleyen zamanlarda Tv icin de response ekleyebilirim aslinda buraya.
+    func fetchAllSearchResults(query: String) -> AnyPublisher<SearchMovieResponse?, Error>? // FIXME: Ilerleyen zamanlarda Tv icin de response ekleyebilirim aslinda buraya.
 }
 
 struct SearchUserCaseImpl: SearchUseCase {
@@ -21,16 +21,28 @@ struct SearchUserCaseImpl: SearchUseCase {
         self.service = service
     }
 
-    func fetchAllSearchResults() -> AnyPublisher<SearchMovieResponse?, Error>? {
+    func fetchAllSearchResults(query: String) -> AnyPublisher<SearchMovieResponse?, Error>? {
         // Service'den arama sonuçlarını döndüren publisher'ı alıyoruz.
-        guard let moviePublisher = service.getSearchMovieResults(api: .getSearchMovieResults(page: 1)) else {
+        guard let moviePublisher = getSearchMovieResults(api: .getSearchMovieResults(page: 1, query: query)) else {
             return nil
         }
         // Publisher'ı doğrudan, tipini soyutlayarak döndürüyoruz.
         return moviePublisher.eraseToAnyPublisher()
     }
 
-    // FIXME: alttaki simdilik boyle dursun. Tv Service ekleyecegimiz zaman ziplicez.
+}
+
+extension SearchUserCaseImpl {
+    func getSearchMovieResults(api: SearchMovieApi) -> AnyPublisher<SearchMovieResponse?, any Error>? {
+        service.getSearchMovieResults(api: api)
+    }
+}
+
+
+
+
+
+// FIXME: alttaki simdilik boyle dursun. Tv Service ekleyecegimiz zaman ziplicez.
 //    func fetchAllSearchResults() -> AnyPublisher<(SearchMovieResponse?), Error>? {
 //        if
 //            let moviePublisher = getSearchMovieResults(api: .getSearchMovieResults(page: 1))
@@ -42,10 +54,3 @@ struct SearchUserCaseImpl: SearchUseCase {
 //        }
 //        return nil
 //    }
-}
-
-extension SearchUserCaseImpl {
-    func getSearchMovieResults(api: SearchMovieApi) -> AnyPublisher<SearchMovieResponse?, any Error>? {
-        service.getSearchMovieResults(api: api)
-    }
-}
