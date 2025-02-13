@@ -9,7 +9,7 @@ import Foundation
 import Moya
 
 enum SearchMovieApi {
-    case getSearchMovieResults(page: Int) //FIXME: bunu simdilik enum olarak birakiyorum. belki ilerleyen zamanlarda searchmovie ve searchtv yi birlestiririm. Mahsuna bir sorcam
+    case getSearchMovieResults(page: Int, query: String) //FIXME: bunu simdilik enum olarak birakiyorum. belki ilerleyen zamanlarda searchmovie ve searchtv yi birlestiririm. Mahsuna bir sorcam
 }
 
 extension SearchMovieApi: TargetType {
@@ -31,11 +31,12 @@ extension SearchMovieApi: TargetType {
     
     var task: Moya.Task {
         switch self {
-        case .getSearchMovieResults(page: let page):
+        case .getSearchMovieResults(page: let page, query: let query):
             var params: [String: Any] = [:]
             params["api_key"] = constants.apiKey
             params["page"] = page
             params["language"] = "en-US"
+            params["query"] = query
             return .requestParameters(parameters: params, encoding: URLEncoding.default)
         }
     }
