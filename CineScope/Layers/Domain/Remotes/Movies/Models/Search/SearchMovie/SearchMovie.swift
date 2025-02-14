@@ -11,6 +11,8 @@ import Foundation
 
 struct SearchMovie: Decodable {
     let posterPath: String
+    let name: String
+    
 
     var fullPosterURL: String {
         let baseURL = "https://image.tmdb.org/t/p/w500" // Resim için temel URL
@@ -19,6 +21,7 @@ struct SearchMovie: Decodable {
     
     enum CodingKeys: String, CodingKey {
         case posterPath = "poster_path"
+        case name = "name"
     }
 }
 
