@@ -21,7 +21,7 @@ struct SearchMovie: Decodable {
     
     enum CodingKeys: String, CodingKey {
         case posterPath = "poster_path"
-        case name = "name"
+        case name = "title"
     }
 }
 

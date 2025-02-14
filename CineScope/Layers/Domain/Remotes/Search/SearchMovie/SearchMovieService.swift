@@ -38,8 +38,10 @@ extension SearchMovieServiceImpl {
                 case .failure(let moyaError):
                     switch moyaError {
                     case .underlying(let error, _):
+                        print("Underlying error: \(error)")
                         promise(.failure(error)) // Ağ hatası
                     default:
+                        print("Moya error: \(moyaError)")
                         promise(.failure(moyaError)) // Diğer Moya hataları
                     }
                 }
