@@ -51,6 +51,7 @@ extension SearchVMImpl {
 // MARK: Service call
 extension SearchVMImpl {
     private func fetchSearchResults(query: String, page: Int) {
+        print("API request started")
         self.output.send(.isLoading(true))
         
         self.useCase?.fetchAllSearchResults(query: query)?
@@ -58,7 +59,8 @@ extension SearchVMImpl {
                 guard let self = self else { return }
                 self.output.send(.isLoading(false))
                 if case .failure(let error) = completion {
-                    self.output.send(.errorOccured(error.localizedDescription))
+                    print("⚠️ Search API Error: \(error.localizedDescription)")
+//                    self.output.send(.errorOccured(error.localizedDescription))
                 }
             }, receiveValue: { [weak self] response in
                 guard let self else { return }
