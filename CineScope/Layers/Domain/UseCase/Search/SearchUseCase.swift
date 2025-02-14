@@ -14,7 +14,7 @@ protocol SearchUseCase {
     func fetchAllSearchResults(query: String) -> AnyPublisher<SearchMovieResponse?, Error>? // FIXME: Ilerleyen zamanlarda Tv icin de response ekleyebilirim aslinda buraya.
 }
 
-struct SearchUserCaseImpl: SearchUseCase {
+struct SearchUseCaseImpl: SearchUseCase {
     private let service: SearchMovieService
 
     init(service: SearchMovieService) {
@@ -32,7 +32,7 @@ struct SearchUserCaseImpl: SearchUseCase {
 
 }
 
-extension SearchUserCaseImpl {
+extension SearchUseCaseImpl {
     func getSearchMovieResults(api: SearchMovieApi) -> AnyPublisher<SearchMovieResponse?, any Error>? {
         service.getSearchMovieResults(api: api)
     }
