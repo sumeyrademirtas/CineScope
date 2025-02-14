@@ -37,7 +37,7 @@ extension SearchListProviderImpl {
     
     enum SearchListProviderInput {
         case setupUI(tableView: UITableView)
-        case prepareCollectionView(data: [SearchMovie])
+        case prepareTableView(data: [SearchMovie])
     }
 }
 
@@ -50,7 +50,7 @@ extension SearchListProviderImpl {
             switch eventType {
             case .setupUI(let tableView):
                 self.setupTableView(tableView: tableView)
-            case .prepareCollectionView(let data):
+            case .prepareTableView(let data):
                 self.prepareTableView(data: data)
             }
         }.store(in: &cancellables)
