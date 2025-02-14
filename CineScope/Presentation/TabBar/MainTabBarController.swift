@@ -30,7 +30,17 @@ class MainTabBarController: UITabBarController {
             image: UIImage(systemName: "tv"),
             tag: 1
         )
+        
+        // Search tabi
+        let searchBuilder = SearchBuilderImpl()
+        let searchVC = searchBuilder.build()
+        searchVC.tabBarItem = UITabBarItem(
+            title: "Search",
+            image: UIImage(systemName: "magnifyingglass"),
+            tag: 2
+        )
+        
         // TabBarController'ın viewControllers'ını ayarlıyoruz.
-        viewControllers = [moviesVC, tvSeriesVC]
+        viewControllers = [moviesVC, tvSeriesVC, searchVC]
     }
 }
