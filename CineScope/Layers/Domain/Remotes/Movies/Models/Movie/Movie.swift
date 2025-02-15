@@ -10,7 +10,7 @@ import Foundation
 // MARK: - Movie
 struct Movie: Decodable {
     let posterPath: String  // su anlik isim sadece posterpath ile.
-    // daha sonra eklemeler yapacagim.
+    let id: Int
     
     var fullPosterURL: String {
         let baseURL = "https://image.tmdb.org/t/p/w500" // Resim için temel URL
@@ -19,6 +19,7 @@ struct Movie: Decodable {
     
     enum CodingKeys: String, CodingKey {
         case posterPath = "poster_path"
+        case id
     }
 }
 
