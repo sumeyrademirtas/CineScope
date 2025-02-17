@@ -12,9 +12,9 @@ class MovieSectionViewCell: UICollectionViewCell {
     static let reuseIdentifier = "MovieSectionViewCell"
     
     var movies = [Movie]()
-    func setUpDataList(movie: [Movie]) {
-        self.movies = movie
-    }
+//    func setUpDataList(movie: [Movie]) {
+//        self.movies = movie
+//    }
     
     private let innerCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -26,6 +26,14 @@ class MovieSectionViewCell: UICollectionViewCell {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
+    
+    // Closure to notify selection events
+    var onMovieSelected: ((Movie) -> Void)?
+    
+    func setUpDataList(movie: [Movie]) {
+        self.movies = movie
+        innerCollectionView.reloadData()
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -75,5 +83,11 @@ extension MovieSectionViewCell: UICollectionViewDataSource, UICollectionViewDele
         return cell
     }
     
+    // MARK: Mahsuna sor. Provider icinde yapamadigim icin burada yaptim problem olur mu?
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let selectedMovie = movies[indexPath.row]
+        print("Inner Cell Tıklandı: \(selectedMovie.title) - ID: \(selectedMovie.id)")
+        onMovieSelected?(selectedMovie)
+    }
     
 }
