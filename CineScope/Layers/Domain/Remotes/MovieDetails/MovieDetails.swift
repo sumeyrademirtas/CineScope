@@ -29,6 +29,11 @@ struct MovieDetails: Decodable {
         return "https://image.tmdb.org/t/p/w500\(posterPath)"
     }
     
+    var backgropPathURL: String {
+        guard let backdropPath else { return "" }
+        return "https://image.tmdb.org/t/p/w500\(backdropPath)"
+    }
+    
     enum CodingKeys: String, CodingKey {
         case id, title, overview, genres, runtime, video
         case releaseDate = "release_date"
