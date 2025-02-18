@@ -5,16 +5,15 @@
 //  Created by Sümeyra Demirtaş on 2/5/25.
 //
 
-import Foundation
 import Combine
+import Foundation
 import UIKit
 
-protocol MovieListProvider : CollectionViewProvider where T == MovieVMImpl.SectionType, I == IndexPath {
+protocol MovieListProvider: CollectionViewProvider where T == MovieVMImpl.SectionType, I == IndexPath {
     func activityHandler(input: AnyPublisher<MovieListProviderImpl.MovieListProviderInput, Never>) -> AnyPublisher<MovieListProviderImpl.MovieListProviderOutput, Never>
 }
 
 final class MovieListProviderImpl: NSObject, MovieListProvider {
-    
     typealias T = MovieVMImpl.SectionType
     typealias I = IndexPath
     var dataList: [MovieVMImpl.SectionType] = []
@@ -28,10 +27,11 @@ final class MovieListProviderImpl: NSObject, MovieListProvider {
 }
 
 // MARK: - EventType
+
 extension MovieListProviderImpl {
-    
     enum MovieListProviderOutput {
-        case didSelect(indexPath: IndexPath)
+//        case didSelect(indexPath: IndexPath)
+        case didSelectMovie(movieId: Int)
     }
     
     enum MovieListProviderInput {
@@ -41,8 +41,8 @@ extension MovieListProviderImpl {
 }
 
 // MARK: - Binding
+
 extension MovieListProviderImpl {
-    
     func activityHandler(input: AnyPublisher<MovieListProviderInput, Never>) -> AnyPublisher<MovieListProviderOutput, Never> {
         input.sink { [weak self] eventType in
             switch eventType {
@@ -51,23 +51,23 @@ extension MovieListProviderImpl {
             case .prepareCollectionView(let data):
                 self?.prepareCollectionView(data: data)
             }
-        }.store(in: &self.cancellables)
+        }.store(in: &cancellables)
         return output.eraseToAnyPublisher()
     }
 }
 
-
-
 // MARK: - CollectionView Setup and Delegation
-extension MovieListProviderImpl: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
 
+extension MovieListProviderImpl: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func setupCollectionView(collectionView: UICollectionView) {
         self.collectionView = collectionView
         self.collectionView?.delegate = self
         self.collectionView?.dataSource = self
         self.collectionView?.register(MovieSectionViewCell.self, forCellWithReuseIdentifier: MovieSectionViewCell.reuseIdentifier)
-        //header icin
+        // header icin
         self.collectionView?.register(UICollectionReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "DefaultHeaderView")
+        
+        print("✅ CollectionView setup tamamlandı!") // Debug için
     }
     
     /// Header View - Section Title Settings
@@ -80,13 +80,13 @@ extension MovieListProviderImpl: UICollectionViewDelegate, UICollectionViewDataS
             .dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "DefaultHeaderView", for: indexPath)
         
         // Eski subviewlar temizleniyor.
-        header.subviews.forEach {
-            $0.removeFromSuperview()
+        for subview in header.subviews {
+            subview.removeFromSuperview()
         }
         
         let category = MovieCategory.orderedCategories[indexPath.section]
         
-        let titleLabel = UILabel(frame: CGRect(x:16, y:0, width: collectionView.frame.width - 32, height: 30))
+        let titleLabel = UILabel(frame: CGRect(x: 16, y: 0, width: collectionView.frame.width - 32, height: 30))
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .heavy)
         titleLabel.textColor = .white
         titleLabel.text = category.displayName
@@ -104,7 +104,6 @@ extension MovieListProviderImpl: UICollectionViewDelegate, UICollectionViewDataS
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return dataList.count
     }
-    
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 1 // Her Section bir adet MovieSectionCell icerecek
@@ -147,41 +146,123 @@ extension MovieListProviderImpl: UICollectionViewDelegate, UICollectionViewDataS
     }
     
     // Hucreyi olusturup yapilandiriyoruz
+//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+//        guard let cell =
+//                collectionView.dequeueReusableCell(withReuseIdentifier: MovieSectionViewCell.reuseIdentifier, for: indexPath) as? MovieSectionViewCell else {
+//            fatalError("Unable to dequeue MovieSectionViewCell")
+//        }
+//        let section = dataList[indexPath.section]
+//        switch section {
+//        case .popular(rows: let rows):
+//            let row = rows[indexPath.row]
+//            switch row {
+//            case .movie(let movie):
+//                cell.setUpDataList(movie: movie)
+//            }
+//        case .upcoming(rows: let rows):
+//            let row = rows[indexPath.row]
+//            switch row {
+//            case .movie(let movie):
+//                cell.setUpDataList(movie: movie)
+//            }
+//        case .nowPlaying(rows: let rows):
+//            let row = rows[indexPath.row]
+//            switch row {
+//            case .movie(let movie):
+//                cell.setUpDataList(movie: movie)
+//            }
+//        case .topRated(rows: let rows):
+//            let row = rows[indexPath.row]
+//            switch row {
+//            case .movie(let movie):
+//                cell.setUpDataList(movie: movie)
+//            }
+//        }
+//        return cell
+//    }
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell =
-                collectionView.dequeueReusableCell(withReuseIdentifier: MovieSectionViewCell.reuseIdentifier, for: indexPath) as? MovieSectionViewCell else {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieSectionViewCell.reuseIdentifier, for: indexPath) as? MovieSectionViewCell else {
             fatalError("Unable to dequeue MovieSectionViewCell")
         }
         let section = dataList[indexPath.section]
         switch section {
-        case .popular(rows: let rows):
+        case .popular(let rows):
             let row = rows[indexPath.row]
             switch row {
-            case .movie(let movie):
-                cell.setUpDataList(movie: movie)
+            case .movie(let movies):
+                cell.setUpDataList(movie: movies)
+                cell.onMovieSelected = { [weak self] selectedMovie in
+                    print("Delegated Selected Movie: \(selectedMovie.title), ID: \(selectedMovie.id)")
+                    self?.output.send(.didSelectMovie(movieId: selectedMovie.id))
+                }
             }
         case .upcoming(rows: let rows):
             let row = rows[indexPath.row]
             switch row {
-            case .movie(let movie):
-                cell.setUpDataList(movie: movie)
+            case .movie(let movies):
+                cell.setUpDataList(movie: movies)
+                cell.onMovieSelected = { [weak self] selectedMovie in
+                    print("Delegated Selected Movie: \(selectedMovie.title), ID: \(selectedMovie.id)")
+                    self?.output.send(.didSelectMovie(movieId: selectedMovie.id))
+                }
             }
         case .nowPlaying(rows: let rows):
             let row = rows[indexPath.row]
             switch row {
-            case .movie(let movie):
-                cell.setUpDataList(movie: movie)
+            case .movie(let movies):
+                cell.setUpDataList(movie: movies)
+                cell.onMovieSelected = { [weak self] selectedMovie in
+                    print("Delegated Selected Movie: \(selectedMovie.title), ID: \(selectedMovie.id)")
+                    self?.output.send(.didSelectMovie(movieId: selectedMovie.id))
+                }
             }
         case .topRated(rows: let rows):
             let row = rows[indexPath.row]
             switch row {
-            case .movie(let movie):
-                cell.setUpDataList(movie: movie)
+            case .movie(let movies):
+                cell.setUpDataList(movie: movies)
+                cell.onMovieSelected = { [weak self] selectedMovie in
+                    print("Delegated Selected Movie: \(selectedMovie.title), ID: \(selectedMovie.id)")
+                    self?.output.send(.didSelectMovie(movieId: selectedMovie.id))
+                }
             }
         }
         return cell
     }
     
+//    // ✅ **Cell'e Tıklama Event'i**
+//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+//        print("🎯 Tıklanan index: \(indexPath.row)") // Hangi satır tıklandı, kontrol edelim
+//
+//        let sectionType = dataList[indexPath.section] // Önce SectionType'ı alıyoruz
+//
+//        switch sectionType {
+//        case .popular(let rows), .upcoming(let rows), .nowPlaying(let rows), .topRated(let rows):
+//            // Seçili index'e karşılık gelen RowType'ı al
+//            let rowType = rows[indexPath.row]
+//
+//            switch rowType {
+//            case .movie(let movies):
+//                guard let selectedMovie = movies.first else { return } // İlk filmi al
+//                print("🎬 Seçilen Film: \(selectedMovie.title), ID: \(selectedMovie.id)")
+//                navigateToMovieDetails(movie: selectedMovie) // Detay sayfasına yönlendir
+//            }
+//        }
+//    }
+    
+    private func navigateToMovieDetails(movie: Movie) {
+        let movieDetailsVC = MovieDetailsBuilderImpl().build(movieId: movie.id)
+        movieDetailsVC.modalPresentationStyle = .fullScreen // Modal tam ekran açılsın
+        movieDetailsVC.modalTransitionStyle = .crossDissolve // Geçiş efekti (isteğe bağlı)
+        
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = scene.windows.first,
+           let rootVC = window.rootViewController
+        {
+            rootVC.present(movieDetailsVC, animated: true)
+        }
+    }
     
     func reloadCollectionView() {
         DispatchQueue.main.async { [weak self] in
@@ -190,8 +271,7 @@ extension MovieListProviderImpl: UICollectionViewDelegate, UICollectionViewDataS
     }
     
     func prepareCollectionView(data: [MovieVMImpl.SectionType]) {
-        self.dataList = data
+        dataList = data
         reloadCollectionView()
     }
-    
 }

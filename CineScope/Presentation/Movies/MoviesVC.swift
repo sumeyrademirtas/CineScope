@@ -83,8 +83,6 @@ extension MoviesVC {
             switch event {
             case .isLoading(let isShow):
                 self?.loading(isShow: isShow)
-//            case .sectionUpdated(let category, let section):
-//                break // MARK: MAhsuna sor
             case .errorOccured(let message):
                 self?.showError(message: message)
             case .dataSource(let section):
@@ -94,13 +92,21 @@ extension MoviesVC {
         
         // providerdan gelen ciktilari dinle
         let providerOutput = provider?.activityHandler(input: inputPR.eraseToAnyPublisher())
-        providerOutput?.sink {
-            [weak self] event in
+        providerOutput?.sink { [weak self] event in
             switch event {
-            case .didSelect(let indexPath):
-                print("Seçilen IndexPath: \(indexPath)")
+            case .didSelectMovie(let movieId):
+                self?.navigateToMovieDetails(movieId: movieId)
             }
         }.store(in: &cancellables)
+//        let providerOutput = provider?.activityHandler(input: inputPR.eraseToAnyPublisher())
+//        providerOutput?.sink {
+//            [weak self] event in
+//            switch event {
+//            case .didSelectMovie(let movieId):
+//                print("📲 Navigasyon çağrıldı! MovieID: \(movieId)")
+//                self?.navigateToMovieDetails(movieId: movieId) // ✅ Navigasyon çağrısı
+//            }
+//        }.store(in: &cancellables)
     }
 }
 
@@ -116,4 +122,24 @@ extension MoviesVC {
         present(alert, animated: true)
     }
 }
+
+// ✅ **Movie Details Sayfasına Geçiş Yap**
+extension MoviesVC {
+    private func navigateToMovieDetails(movieId: Int) {
+        let movieDetailsVC = MovieDetailsBuilderImpl().build(movieId: movieId)
+        movieDetailsVC.modalPresentationStyle = .pageSheet
+        movieDetailsVC.modalTransitionStyle = .crossDissolve
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = scene.windows.first,
+           let rootVC = window.rootViewController {
+            rootVC.present(movieDetailsVC, animated: true)
+        }
+    }
+//    private func navigateToMovieDetails(movieId: Int) {
+//        let movieDetailsVC = MovieDetailsBuilderImpl().build(movieId: movieId)
+//        movieDetailsVC.modalPresentationStyle = .fullScreen // Modal olarak aç
+//        present(movieDetailsVC, animated: true, completion: nil) // ✅ MovieDetails sayfasını aç
+//    }
+}
+
 
