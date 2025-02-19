@@ -17,7 +17,8 @@ struct MovieDetailsBuilderImpl: MovieDetailsBuilder {
     func build(movieId: Int) -> UIViewController {
         
         let service = MovieDetailsServiceImpl()
-        let useCase = MovieDetailsUseCaseImpl(service: service)
+        let videoService = MovieVideosServiceImpl()
+        let useCase = MovieDetailsUseCaseImpl(service: service, videoService: videoService)
         let viewModel = MovieDetailsVMImpl(useCase: useCase)
         let provider = MovieDetailsProviderImpl()
 
