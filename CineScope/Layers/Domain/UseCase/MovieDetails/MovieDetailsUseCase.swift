@@ -11,7 +11,7 @@ import Combine
 // MARK: - Protocol Definition
 protocol MovieDetailsUseCase {
     func fetchMovieDetails(movieId: Int) -> AnyPublisher<MovieDetails?, Error>?
-    func fetchMovieVideos(movieId: Int) -> AnyPublisher<MovieVideo?, Error>? // 🎬 Yeni method
+//    func fetchMovieVideos(movieId: Int) -> AnyPublisher<MovieVideo?, Error>? // 🎬 Yeni method
 
 }
 
