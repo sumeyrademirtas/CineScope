@@ -36,6 +36,8 @@ class MovieDetailsVC: BaseViewController {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
+    
+
 
     // MARK: - Init
 
@@ -59,6 +61,7 @@ class MovieDetailsVC: BaseViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
 
         view.backgroundColor = .white
 
@@ -100,6 +103,7 @@ extension MovieDetailsVC {
             case .isLoading(let isShow):
                 self?.loading(isShow: isShow)
             case .movieDetails(let details):
+                print("✅ Movie Details Alındı: \(details.title)")
                 self?.inputPR.send(.prepareCollectionView(data: [details]))
             case .errorOccurred(let message):
                 self?.showError(message: message)
