@@ -72,15 +72,43 @@ extension MovieDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewDa
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
             withReuseIdentifier: MovieDetailsHeaderView.reuseIdentifier
         )
+        self.collectionView?.register(
+               MovieDetailsContentCell.self,
+               forCellWithReuseIdentifier: MovieDetailsContentCell.reuseIdentifier
+           )
+
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: collectionView.frame.width, height: 250)
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 0
-        }
+        print("📢 CollectionView Item Count: \(dataList.count)")
+        return dataList.isEmpty ? 0 : 1
+    }
     
     // 🔹 Cell oluşturma - Şimdilik boş bırakıyorum çünkü detayları ileride dolduracağız.
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        return UICollectionViewCell() // Boş bir hücre döndür.
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: MovieDetailsContentCell.reuseIdentifier,
+            for: indexPath
+        ) as! MovieDetailsContentCell
+
+        if let movieDetails = dataList.first {
+            print("✅ Hücreye Veri Gönderiliyor: \(movieDetails.overview)")
+            cell.configure(
+                with: movieDetails.overview,
+                genres: movieDetails.genres?.map { $0.name }.joined(separator: ", ") ?? "N/A",
+                posterURL: movieDetails.fullPosterURL
+            )
+        } else {
+            print("⚠️ dataList.first() boş!")
+        }
+        
+        return cell
     }
     
     // 🔹 Header'ı göstermek için eklenmesi gereken method
@@ -100,14 +128,14 @@ extension MovieDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewDa
         ) as! MovieDetailsHeaderView
         
         if let movieDetails = dataList.first {
-            header.configure(with: movieDetails) // Header’a film detaylarını gönderiyoruz.
+            header.configure(with: movieDetails.title) // Başlığı header'a gönderiyoruz
         }
         
         return header
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: collectionView.frame.width, height: 300) // 🔹 Header için 300px yükseklik verdik.
+        return CGSize(width: collectionView.frame.width, height: 250) // 🔹 Header için 300px yükseklik verdik.
     }
     
     func reloadCollectionView() {
@@ -118,6 +146,7 @@ extension MovieDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewDa
     
     func prepareCollectionView(data: [MovieDetails]) {
         dataList = data
+        print("📢 CollectionView Güncelleniyor, Veri Sayısı: \(data.count)")
         reloadCollectionView()
     }
 }
