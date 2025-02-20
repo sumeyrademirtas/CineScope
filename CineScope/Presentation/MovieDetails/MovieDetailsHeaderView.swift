@@ -36,7 +36,7 @@ class MovieDetailsHeaderView: UICollectionReusableView {
             trailerPlayerView.topAnchor.constraint(equalTo: topAnchor),
             trailerPlayerView.leadingAnchor.constraint(equalTo: leadingAnchor),
             trailerPlayerView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            trailerPlayerView.heightAnchor.constraint(equalToConstant: 250)
+            trailerPlayerView.heightAnchor.constraint(equalToConstant: 250)])
     }
 
 }
