@@ -19,12 +19,12 @@ struct MovieDetailsUseCaseImpl: MovieDetailsUseCase {
 
     
     private let service: MovieDetailsService
-    private let videoService: MovieVideosService // 🎬 Yeni servis
+//    private let videoService: MovieVideosService // 🎬 Yeni servis
 
     
-    init(service: MovieDetailsService, videoService: MovieVideosService) {
+    init(service: MovieDetailsService/*, videoService: MovieVideosService*/) {
         self.service = service
-        self.videoService = videoService
+//        self.videoService = videoService
 
     }
     
@@ -33,15 +33,15 @@ struct MovieDetailsUseCaseImpl: MovieDetailsUseCase {
         return movieDetailsPublisher.eraseToAnyPublisher()
     }
     
-    func fetchMovieVideos(movieId: Int) -> AnyPublisher<MovieVideo?, Error>? {
-        print("🎬 UseCase -> Fetch Movie Videos API çağrıldı! movieId: \(movieId)")
-
-        return videoService.getMovieVideo(api: .getMovieVideos(movieId: movieId))?
-            .compactMap { $0?.results.first { $0.youtubeURL != nil }
-            } // 🔥 Model'deki `youtubeURL`'i kullan
-        
-            .eraseToAnyPublisher()
-    }
+//    func fetchMovieVideos(movieId: Int) -> AnyPublisher<MovieVideo?, Error>? {
+//        print("🎬 UseCase -> Fetch Movie Videos API çağrıldı! movieId: \(movieId)")
+//
+//        return videoService.getMovieVideo(api: .getMovieVideos(movieId: movieId))?
+//            .compactMap { $0?.results.first { $0.youtubeURL != nil }
+//            } // 🔥 Model'deki `youtubeURL`'i kullan
+//        
+//            .eraseToAnyPublisher()
+//    }
     
 }
 
@@ -51,7 +51,7 @@ extension MovieDetailsUseCaseImpl {
         service.getMovieDetails(api: api)
     }
     
-    func getMovieVideos(api: MovieVideosApi) -> AnyPublisher<MovieVideosResponse?, any Error>? {
-        videoService.getMovieVideo(api: api) 
-    }
+//    func getMovieVideos(api: MovieVideosApi) -> AnyPublisher<MovieVideosResponse?, any Error>? {
+//        videoService.getMovieVideo(api: api) 
+//    }
 }
