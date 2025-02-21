@@ -82,7 +82,7 @@ extension MovieDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewDa
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionView.frame.width, height: 250)
+        return CGSize(width: collectionView.frame.width, height: 300)
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -102,7 +102,11 @@ extension MovieDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewDa
             cell.configure(
                 with: movieDetails.overview,
                 genres: movieDetails.genres?.map { $0.name }.joined(separator: ", ") ?? "N/A",
-                posterURL: movieDetails.fullPosterURL
+                posterURL: movieDetails.fullPosterURL,
+                voteAverage: movieDetails.voteAverage, // 🔥 Eklenen parametre
+                releaseDate: movieDetails.releaseDate,
+                runtime: movieDetails.formattedRuntime
+                
             )
         } else {
             print("⚠️ dataList.first() boş!")
@@ -135,7 +139,7 @@ extension MovieDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewDa
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: collectionView.frame.width, height: 250) // 🔹 Header için 300px yükseklik verdik.
+        return CGSize(width: collectionView.frame.width, height: 260) // 🔹 Header için 300px yükseklik verdik.
     }
     
     func reloadCollectionView() {
