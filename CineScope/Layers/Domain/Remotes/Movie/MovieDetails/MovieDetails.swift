@@ -34,6 +34,14 @@ struct MovieDetails: Decodable {
         return "https://image.tmdb.org/t/p/w500\(backdropPath)"
     }
     
+    // ✅ **Saat ve dakika formatına çeviren property**
+    var formattedRuntime: String {
+        guard let runtime else { return "N/A" }
+        let hours = runtime / 60
+        let minutes = runtime % 60
+        return hours > 0 ? "\(hours)h \(minutes)m" : "\(minutes)m"
+    }
+    
     enum CodingKeys: String, CodingKey {
         case id, title, overview, genres, runtime, video
         case releaseDate = "release_date"
