@@ -7,7 +7,17 @@
 
 import Foundation
 
-// MARK: - Cast
+// MARK: - MovieCredits 
+struct MovieCredits: Decodable {
+    let id: Int
+    let cast: [Cast]  // 🎬 Oyuncuları içeren dizi
+
+    enum CodingKeys: String, CodingKey {
+        case id, cast
+    }
+}
+
+// MARK: - Cast (Her bir oyuncu için)
 struct Cast: Decodable {
     let adult: Bool?
     let gender, id: Int?
@@ -17,7 +27,6 @@ struct Cast: Decodable {
     let castID: Int?
     let character, creditID: String?
     let order: Int?
-    let department, job: String?
     
     var profilePathURL: String {
         guard let profilePath else { return "" }
@@ -34,6 +43,6 @@ struct Cast: Decodable {
         case castID = "cast_id"
         case character
         case creditID = "credit_id"
-        case order, department, job
+        case order
     }
 }
