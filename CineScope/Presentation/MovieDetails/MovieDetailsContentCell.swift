@@ -1,27 +1,31 @@
+////
+////  MovieDetailsContentView.swift
+////  CineScope
+////
+////  Created by Sümeyra Demirtaş on 2/20/25.
+////
 //
-//  MovieDetailsContentView.swift
-//  CineScope
-//
-//  Created by Sümeyra Demirtaş on 2/20/25.
-//
+
 
 import UIKit
 
 class MovieDetailsContentCell: UICollectionViewCell {
     static let reuseIdentifier = "MovieDetailsContentCell"
-    
-    
+
+    // MARK: - UI Elements
+
+    // Poster Image
     private let posterImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 8
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        // Sabit genişlik belirleyelim
         imageView.widthAnchor.constraint(equalToConstant: 130).isActive = true
         return imageView
     }()
-    
+
+    // Overview
     private let overviewLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16)
@@ -32,17 +36,28 @@ class MovieDetailsContentCell: UICollectionViewCell {
         return label
     }()
 
+    //Genre
     private let genreLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.italicSystemFont(ofSize: 14)
-        label.textColor = .black
+        label.textColor = .white
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
-    
-    // Sağ tarafta genre ve overview'u barındıracak dikey stack view
+
+    // MARK: - Poster + Info Stack (yatay)
+    private let horizontalStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 16
+        stackView.alignment = .top
+        stackView.distribution = .fill
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
+
+    // MARK: - Info (dikey)
     private let infoStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -52,21 +67,57 @@ class MovieDetailsContentCell: UICollectionViewCell {
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
+
+    // MARK: - Rating Progress
+    private let ratingProgressView: CircularProgressView = {
+        let view = CircularProgressView(radius: 16) // ✅ Artık büyüklüğü değişiyor
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
     
-    // Tüm elemanları yatay olarak yerleştirecek container stack view
-    private let containerStackView: UIStackView = {
+    private let releaseDateLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.boldSystemFont(ofSize: 14)
+        label.textColor = .white
+        label.numberOfLines = 0
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let runtimeLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.boldSystemFont(ofSize: 14)
+        label.textColor = .white
+        label.numberOfLines = 0
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
+    // MARK: - Rating, ReleaseDate, Runtime
+    private let ratingDateRuntimeStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
+        stackView.spacing = 8
+        stackView.alignment = .center
+        stackView.distribution = .equalSpacing
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
+
+    // MARK: - Tüm Layout'u Tutan Dikey Stack
+    private let verticalStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
         stackView.spacing = 16
-        stackView.alignment = .top
+        stackView.alignment = .fill
         stackView.distribution = .fill
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
-    
+
+    // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.backgroundColor = .orange  // Debug için
         setupUI()
     }
 
@@ -74,39 +125,72 @@ class MovieDetailsContentCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
+    // MARK: - Setup UI
     private func setupUI() {
-           // Info stack view'a genre ve overview label'larını ekleyelim
-           infoStackView.addArrangedSubview(genreLabel)
-           infoStackView.addArrangedSubview(overviewLabel)
-           
-           // Container stack view'a sol tarafta poster, sağ tarafta info stack ekleyelim
-           containerStackView.addArrangedSubview(posterImageView)
-           containerStackView.addArrangedSubview(infoStackView)
-           
-           // Container stack view'ı contentView'e ekleyip kenarlardan sabit aralık verelim
-           contentView.addSubview(containerStackView)
-           NSLayoutConstraint.activate([
-               containerStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
-               containerStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-               containerStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-               containerStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16)
-           ])
-       }
-    
-    // Hücreyi yapılandırmak için: overview, genres ve posterURL kullanılır.
-    func configure(with overview: String, genres: String, posterURL: String?) {
-        print("✅ Hücreye Veri Gönderiliyor: \(overview)")
+        contentView.backgroundColor = UIColor(hue: 0.65, saturation: 0.27, brightness: 0.18, alpha: 1.00) // Debug
+        NSLayoutConstraint.activate([
+            ratingProgressView.widthAnchor.constraint(equalToConstant: 40), // Genişlik
+            ratingProgressView.heightAnchor.constraint(equalToConstant: 40) // Yükseklik
+        ])
+
+        // Info stack'e genre + overview ekle
+        infoStackView.addArrangedSubview(genreLabel)
+        infoStackView.addArrangedSubview(overviewLabel)
+
+        // Horizontal stack'e poster + info ekle
+        horizontalStackView.addArrangedSubview(posterImageView)
+        horizontalStackView.addArrangedSubview(infoStackView)
+
+        // Rating stack'e ratingProgressView ekle (İleride başka elemanlar da ekleyebilirsin)
+        ratingDateRuntimeStackView.addArrangedSubview(ratingProgressView)
+        ratingDateRuntimeStackView.addArrangedSubview(releaseDateLabel)
+        ratingDateRuntimeStackView.addArrangedSubview(runtimeLabel)
+
+        // Dikey stack'e sırasıyla horizontalStackView (poster + info), sonra ratingStackView ekle
+        verticalStackView.addArrangedSubview(horizontalStackView)
+        verticalStackView.addArrangedSubview(ratingDateRuntimeStackView)
+
+        contentView.addSubview(verticalStackView)
+
+        // Dikey stack'i kenarlardan sabitle
+        NSLayoutConstraint.activate([
+            verticalStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
+            verticalStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            verticalStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            verticalStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16)
+        ])
+    }
+
+    // MARK: - Configure
+    func configure(with overview: String, genres: String, posterURL: String?, voteAverage: CGFloat, releaseDate: String, runtime: String) {
         overviewLabel.text = overview
         genreLabel.text = genres
-        
-        // loadImage fonksiyonunu kullanarak resmi indiriyoruz.
+        ratingProgressView.setProgress(voteAverage: voteAverage) // Oranı ayarla
         loadImage(from: posterURL)
+        
+        // SF Symbol ile Release Date Label
+        let calendarIcon = NSTextAttachment()
+        calendarIcon.image = UIImage(systemName: "calendar")?.withTintColor(.white, renderingMode: .alwaysOriginal)
+        calendarIcon.bounds = CGRect(x: 0, y: -2, width: 14, height: 14)
+
+        let releaseAttributedString = NSMutableAttributedString(attachment: calendarIcon)
+        releaseAttributedString.append(NSAttributedString(string: " \(releaseDate)"))
+        releaseDateLabel.attributedText = releaseAttributedString
+
+        // SF Symbol ile Runtime Label
+        let clockIcon = NSTextAttachment()
+        clockIcon.image = UIImage(systemName: "clock")?.withTintColor(.white, renderingMode: .alwaysOriginal)
+        clockIcon.bounds = CGRect(x: 0, y: -2, width: 14, height: 14)
+
+        let runtimeAttributedString = NSMutableAttributedString(attachment: clockIcon)
+        runtimeAttributedString.append(NSAttributedString(string: " \(runtime)"))
+        runtimeLabel.attributedText = runtimeAttributedString
     }
-    
-    // URL'den resim yükleme metodu
+
+    // MARK: - Load Image
     private func loadImage(from urlString: String?) {
         guard let urlString = urlString, let url = URL(string: urlString) else {
-            posterImageView.image = UIImage(named: "placeholder") // Varsayılan görsel
+            posterImageView.image = UIImage(named: "placeholder")
             return
         }
         URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
