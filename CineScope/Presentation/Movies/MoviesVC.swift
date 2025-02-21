@@ -135,11 +135,6 @@ extension MoviesVC {
             rootVC.present(movieDetailsVC, animated: true)
         }
     }
-//    private func navigateToMovieDetails(movieId: Int) {
-//        let movieDetailsVC = MovieDetailsBuilderImpl().build(movieId: movieId)
-//        movieDetailsVC.modalPresentationStyle = .fullScreen // Modal olarak aç
-//        present(movieDetailsVC, animated: true, completion: nil) // ✅ MovieDetails sayfasını aç
-//    }
 }
 
 
