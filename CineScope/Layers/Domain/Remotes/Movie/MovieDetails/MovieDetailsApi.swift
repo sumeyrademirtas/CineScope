@@ -34,7 +34,6 @@ extension MovieDetailsApi: TargetType {
             var params: [String: Any] = [:]
             params["api_key"] = constants.apiKey
             params["language"] = "en-US"
-            params["movie_id"] = movieId
             return .requestParameters(parameters: params, encoding: URLEncoding.default)
         }
     }
