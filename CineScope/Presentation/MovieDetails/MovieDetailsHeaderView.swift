@@ -12,7 +12,7 @@ class MovieDetailsHeaderView: UICollectionReusableView {
     
     private let titleLabel: UILabel = {
             let label = UILabel()
-            label.font = UIFont.boldSystemFont(ofSize: 24)
+            label.font = UIFont.boldSystemFont(ofSize: 20)
             label.textColor = .white
             label.textAlignment = .center
             label.numberOfLines = 2
@@ -32,7 +32,7 @@ class MovieDetailsHeaderView: UICollectionReusableView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
-        backgroundColor = UIColor.blue.withAlphaComponent(0.5)
+        backgroundColor = UIColor(hue: 0.65, saturation: 0.27, brightness: 0.18, alpha: 1.00) // Debug
     }
 
     @available(*, unavailable)
