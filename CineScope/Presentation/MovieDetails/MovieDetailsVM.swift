@@ -19,15 +19,18 @@ final class MovieDetailsVMImpl: MovieDetailsVM {
     private let output = PassthroughSubject<MovieDetailsVMOutput, Never>()
     private var cancellables = Set<AnyCancellable>()
     
-    //usecase
-    private var useCase: MovieDetailsUseCase?
-    
-    init(useCase: MovieDetailsUseCase) {
-        self.useCase = useCase
+    // UseCases
+    private var movieDetailsUseCase: MovieDetailsUseCase?
+    private var movieCreditsUseCase: MovieCreditsUseCase? // 🎭 Yeni eklendi
+
+    init(movieDetailsUseCase: MovieDetailsUseCase, movieCreditsUseCase: MovieCreditsUseCase) {
+        self.movieDetailsUseCase = movieDetailsUseCase
+        self.movieCreditsUseCase = movieCreditsUseCase
     }
     
-    //data storage
+    // Data storage
     private var movieDetails: MovieDetails?
+    private var movieCredits: MovieCredits? // 🎭 Yeni eklendi
 
 }
 
@@ -37,12 +40,15 @@ extension MovieDetailsVMImpl {
     
     enum MovieDetailsVMInput {
         case fetchMovieDetails(movieId: Int)
+        case fetchMovieCredits(movieId: Int) // 🎭 Yeni eklendi
+
     }
     
     enum MovieDetailsVMOutput {
         case isLoading(Bool)
         case movieDetails(MovieDetails)
         case errorOccurred(String)
+        case movieCredits([Cast]) // 🎭 Yeni eklendi
     }
 }
 
@@ -52,7 +58,7 @@ extension MovieDetailsVMImpl {
         print("Fetch Movie Details API request started")
         self.output.send(.isLoading(true))
         
-        self.useCase?.fetchMovieDetails(movieId: movieId)?
+        self.movieDetailsUseCase?.fetchMovieDetails(movieId: movieId)?
             .sink(receiveCompletion: { [weak self] completion in
                 guard let self = self else { return }
                 self.output.send(.isLoading(false))
@@ -68,6 +74,29 @@ extension MovieDetailsVMImpl {
                 }
             }).store(in: &cancellables)
     }
+    
+    private func fetchMovieCredits(movieId: Int) {
+            print("🎭 Fetch Movie Credits API çağrısı başlatıldı! movieId: \(movieId)")
+            
+            self.movieCreditsUseCase?.fetchMovieCredits(movieId: movieId)?
+                .sink(receiveCompletion: { [weak self] completion in
+                    guard let self = self else { return }
+                    if case .failure(let error) = completion {
+                        print("⚠️ FetchMovieCredits API Hatası: \(error.localizedDescription)")
+                        self.output.send(.errorOccurred("Oyuncu bilgileri yüklenirken hata oluştu."))
+                    }
+                }, receiveValue: { [weak self] response in
+                    guard let self = self else { return }
+                    if let credits = response {
+                        print("Fetched credits: \(credits.cast.count) cast members")
+                        self.movieCredits = credits
+                        self.output.send(.movieCredits(credits.cast)) // 🎭 Output'a gönderiyoruz
+                    } else {
+                        self.output.send(.errorOccurred("Oyuncu bilgileri bulunamadı."))
+                    }
+                })
+                .store(in: &cancellables)
+        }
 }
 
 
@@ -79,6 +108,8 @@ extension MovieDetailsVMImpl {
             switch inputEvent {
             case .fetchMovieDetails(let movieId):
                 self.fetchMovieDetails(movieId: movieId)
+            case .fetchMovieCredits(let movieId):
+                self.fetchMovieCredits(movieId: movieId)
             }
         }.store(in: &cancellables)
         return output.eraseToAnyPublisher()
