@@ -21,14 +21,14 @@ class MovieDetailsContentCell: UICollectionViewCell {
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 8
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.widthAnchor.constraint(equalToConstant: 130).isActive = true
+        imageView.widthAnchor.constraint(equalToConstant: 150).isActive = true
         return imageView
     }()
 
     // Overview
     private let overviewLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 16)
+        label.font = UIFont.systemFont(ofSize: 14)
         label.textColor = .white
         label.numberOfLines = 0
         label.textAlignment = .natural
