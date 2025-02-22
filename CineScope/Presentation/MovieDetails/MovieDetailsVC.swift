@@ -61,9 +61,12 @@ class MovieDetailsVC: BaseViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
 
 
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(hue: 0.65, saturation: 0.27, brightness: 0.18, alpha: 1.00) // Debug
+        collectionView.contentInsetAdjustmentBehavior = .never
+
 
         setupUI()
         binding()
@@ -71,6 +74,7 @@ class MovieDetailsVC: BaseViewController {
         // 🔥 Eğer `movieId` varsa detayları getir
         if let movieId = movieId {
             inputVM.send(.fetchMovieDetails(movieId: movieId))
+            inputVM.send(.fetchMovieCredits(movieId: movieId)) // Cast için de ekle
         }
         
         print("🛠️ CollectionView Delegate: \(String(describing: collectionView.delegate))")
@@ -107,7 +111,9 @@ extension MovieDetailsVC {
                 self?.inputPR.send(.prepareCollectionView(data: [details]))
             case .errorOccurred(let message):
                 self?.showError(message: message)
-            }
+            case .movieCredits(let cast):
+                print("🎭 Oyuncular alındı! Cast Count: \(cast.count)")
+                self?.inputPR.send(.updateCast(cast: cast))            }
         }.store(in: &cancellables)
 
         let providerOutput = provider?.activityHandler(input: inputPR.eraseToAnyPublisher())
