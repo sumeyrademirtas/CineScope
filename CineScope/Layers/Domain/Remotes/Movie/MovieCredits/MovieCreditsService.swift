@@ -28,9 +28,14 @@ extension MovieCreditsServiceImpl {
             provider.request(api) { result in
                 switch result {
                 case .success(let response):
+                    print("Response data count: \(response.data.count)")
+                    if let jsonString = String(data: response.data, encoding: .utf8) {
+                        print("Raw API JSON: \(jsonString)")
+                    }
                     do {
                         // JSON verisini decode et ve unwrap yap
                         let decodedResponse = try JSONDecoder().decode(MovieCredits.self, from: response.data)
+                        print("API returned \(decodedResponse.cast.count) cast members")
                         promise(.success(decodedResponse)) // Başarıyla promise gönder
                     } catch {
                         promise(.failure(error)) // JSON decode hatası
