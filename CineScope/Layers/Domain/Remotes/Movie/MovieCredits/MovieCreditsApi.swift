@@ -25,7 +25,7 @@ extension MovieCreditsApi: TargetType {
     var path: String {
         switch self {
         case .getMovieCredits(let movieId):
-            return "movie/\(movieId)/credits"
+            return "/movie/\(movieId)/credits"
         }
     }
     
@@ -35,7 +35,7 @@ extension MovieCreditsApi: TargetType {
     
     var task: Moya.Task {
         switch self {
-        case .getMovieCredits(movieId: let movieId):
+        case .getMovieCredits:
             var params: [String: Any] = [:]
             params["api_key"] = constants.apiKey
             params["language"] = "en-US"
