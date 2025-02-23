@@ -18,10 +18,11 @@ struct MovieDetailsBuilderImpl: MovieDetailsBuilder {
         
         let movieDetailsService = MovieDetailsServiceImpl()
         let movieCreditsService = MovieCreditsServiceImpl()
-//        let videoService = MovieVideosServiceImpl()
+        let movieVideoService = MovieVideosServiceImpl()
         let movieDetailsUseCase = MovieDetailsUseCaseImpl(service: movieDetailsService/*, videoService: videoService*/)
         let movieCreditsUseCase = MovieCreditsUseCaseImpl(service: movieCreditsService)
-        let viewModel = MovieDetailsVMImpl(movieDetailsUseCase: movieDetailsUseCase, movieCreditsUseCase: movieCreditsUseCase)
+        let movieVideoUseCase = MovieVideoUseCaseImpl(service: movieVideoService)
+        let viewModel = MovieDetailsVMImpl(movieDetailsUseCase: movieDetailsUseCase, movieCreditsUseCase: movieCreditsUseCase, movieVideosUseCase: movieVideoUseCase)
         let provider = MovieDetailsProviderImpl()
 
         let vc = MovieDetailsVC(viewModel: viewModel, provider: provider)
