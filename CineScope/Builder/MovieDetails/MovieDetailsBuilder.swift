@@ -16,10 +16,12 @@ protocol MovieDetailsBuilder {
 struct MovieDetailsBuilderImpl: MovieDetailsBuilder {
     func build(movieId: Int) -> UIViewController {
         
-        let service = MovieDetailsServiceImpl()
+        let movieDetailsService = MovieDetailsServiceImpl()
+        let movieCreditsService = MovieCreditsServiceImpl()
 //        let videoService = MovieVideosServiceImpl()
-        let useCase = MovieDetailsUseCaseImpl(service: service/*, videoService: videoService*/)
-        let viewModel = MovieDetailsVMImpl(useCase: useCase)
+        let movieDetailsUseCase = MovieDetailsUseCaseImpl(service: movieDetailsService/*, videoService: videoService*/)
+        let movieCreditsUseCase = MovieCreditsUseCaseImpl(service: movieCreditsService)
+        let viewModel = MovieDetailsVMImpl(movieDetailsUseCase: movieDetailsUseCase, movieCreditsUseCase: movieCreditsUseCase)
         let provider = MovieDetailsProviderImpl()
 
         let vc = MovieDetailsVC(viewModel: viewModel, provider: provider)
