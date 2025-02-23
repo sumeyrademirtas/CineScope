@@ -65,8 +65,20 @@ class MovieDetailsHeaderView: UICollectionReusableView {
             // trailerPlayerView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
+    
+    func loadYouTubeVideo(videoID: String) {
+        trailerPlayerView.loadYouTubeVideo(videoID: videoID)
+    }
 
-    func configure(with title: String) {
-          titleLabel.text = title
-      }
+    func configure(with title: String, trailerVideoID: String?) {
+        titleLabel.text = title
+        if let videoID = trailerVideoID, !videoID.isEmpty {
+            print("Configuring header with trailer video ID: \(videoID)")
+            trailerPlayerView.loadYouTubeVideo(videoID: videoID)
+        } else {
+            print("No trailer video ID provided")
+        }
+    }
+    
+    
 }
