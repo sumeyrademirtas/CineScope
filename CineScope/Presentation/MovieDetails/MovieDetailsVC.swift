@@ -75,6 +75,7 @@ class MovieDetailsVC: BaseViewController {
         if let movieId = movieId {
             inputVM.send(.fetchMovieDetails(movieId: movieId))
             inputVM.send(.fetchMovieCredits(movieId: movieId)) // Cast için de ekle
+            inputVM.send(.fetchMovieVideos(movieId: movieId))
         }
         
         print("🛠️ CollectionView Delegate: \(String(describing: collectionView.delegate))")
@@ -113,7 +114,11 @@ extension MovieDetailsVC {
                 self?.showError(message: message)
             case .movieCredits(let cast):
                 print("🎭 Oyuncular alındı! Cast Count: \(cast.count)")
-                self?.inputPR.send(.updateCast(cast: cast))            }
+                self?.inputPR.send(.updateCast(cast: cast))
+            case .movieVideos(let videos):
+                print("🎬 Trailer Videos Alındı: \(videos.count)")
+                self?.inputPR.send(.updateTrailer(video: videos))
+            }
         }.store(in: &cancellables)
 
         let providerOutput = provider?.activityHandler(input: inputPR.eraseToAnyPublisher())
