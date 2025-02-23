@@ -19,6 +19,7 @@ final class MovieDetailsProviderImpl: NSObject, MovieDetailsProvider {
     
     var dataList: [MovieDetails] = []
     var castList: [Cast] = [] // Yeni: Cast verilerini saklamak için
+    var trailer: [MovieVideo] = []
 
     
     // binding
@@ -42,6 +43,7 @@ extension MovieDetailsProviderImpl {
         case setupUI(collectionView: UICollectionView)
         case prepareCollectionView(data: [MovieDetails])
         case updateCast(cast: [Cast]) // Yeni: Cast verilerini güncellemek için
+        case updateTrailer(video: [MovieVideo])
 
     }
 }
@@ -60,6 +62,8 @@ extension MovieDetailsProviderImpl {
             case .updateCast(cast: let cast):
                 self.updateCastList(cast: cast)
 
+            case .updateTrailer(video: let video):
+                self.updateTrailer(video: video)
             }
         }.store(in: &cancellables)
         return output.eraseToAnyPublisher()
@@ -173,8 +177,15 @@ extension MovieDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewDa
                 for: indexPath
             ) as! MovieDetailsHeaderView
             
+//            if let movieDetails = dataList.first {
+//                header.configure(with: movieDetails.title, trailerVideoID: )
+//            }
             if let movieDetails = dataList.first {
-                header.configure(with: movieDetails.title)
+                // Trailer array'inde uygun trailer varsa, YouTube URL'sinin video ID'sini çıkarıyoruz.
+                // Örneğin: "https://www.youtube.com/watch?v=Kp6WlyxBHBM" → "Kp6WlyxBHBM"
+                let trailerVideoID = self.trailer.first?.youtubeURL?.absoluteString.components(separatedBy: "v=").last
+                print("Header configuring with title: \(movieDetails.title) and trailer video ID: \(String(describing: trailerVideoID))")
+                header.configure(with: movieDetails.title, trailerVideoID: trailerVideoID)
             }
             
             return header
@@ -214,4 +225,12 @@ extension MovieDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewDa
         print("Cast list updated with \(cast.count) items")
         reloadCollectionView()
     }
+    
+    // Yeni: Trailer güncelleme metodu
+    func updateTrailer(video: [MovieVideo]) {
+        self.trailer = video
+        reloadCollectionView()
+    }
+    
+    
 }
