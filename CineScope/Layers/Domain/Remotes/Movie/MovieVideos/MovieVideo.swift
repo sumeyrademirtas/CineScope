@@ -18,7 +18,7 @@ struct MovieVideo: Decodable {
     }
     
     
-    // site: youtube, type: trailer olacak sekilde filtreliyor.
+    // ✅ Eğer video YouTube ve Trailer ise URL oluşturur
     var youtubeURL: URL? {
         guard site.lowercased() == "youtube", type.lowercased() == "trailer" else { return nil }
         return URL(string: "https://www.youtube.com/watch?v=\(key)")
@@ -27,6 +27,12 @@ struct MovieVideo: Decodable {
 
 
 struct MovieVideosResponse: Decodable {
+    let id: Int
     let results: [MovieVideo]
+    
+    // ✅ **En iyi trailer'ı döndüren fonksiyon** (YouTube ve Trailer filtresi)
+    var bestTrailer: MovieVideo? {
+        return results.first { $0.site.lowercased() == "youtube" && $0.type.lowercased() == "trailer" }
+    }
 }
 
