@@ -22,15 +22,18 @@ final class MovieDetailsVMImpl: MovieDetailsVM {
     // UseCases
     private var movieDetailsUseCase: MovieDetailsUseCase?
     private var movieCreditsUseCase: MovieCreditsUseCase? // 🎭 Yeni eklendi
+    private var movieVideosUseCase: MovieVideoUseCase?
 
-    init(movieDetailsUseCase: MovieDetailsUseCase, movieCreditsUseCase: MovieCreditsUseCase) {
+    init(movieDetailsUseCase: MovieDetailsUseCase, movieCreditsUseCase: MovieCreditsUseCase, movieVideosUseCase: MovieVideoUseCase) {
         self.movieDetailsUseCase = movieDetailsUseCase
         self.movieCreditsUseCase = movieCreditsUseCase
+        self.movieVideosUseCase = movieVideosUseCase
     }
     
     // Data storage
     private var movieDetails: MovieDetails?
     private var movieCredits: MovieCredits? // 🎭 Yeni eklendi
+    private var movieVideos: MovieVideosResponse?
 
 }
 
@@ -41,6 +44,7 @@ extension MovieDetailsVMImpl {
     enum MovieDetailsVMInput {
         case fetchMovieDetails(movieId: Int)
         case fetchMovieCredits(movieId: Int) // 🎭 Yeni eklendi
+        case fetchMovieVideos(movieId: Int)
 
     }
     
@@ -49,6 +53,7 @@ extension MovieDetailsVMImpl {
         case movieDetails(MovieDetails)
         case errorOccurred(String)
         case movieCredits([Cast]) // 🎭 Yeni eklendi
+        case movieVideos([MovieVideo])
     }
 }
 
@@ -97,6 +102,28 @@ extension MovieDetailsVMImpl {
                 })
                 .store(in: &cancellables)
         }
+    
+    private func fetchMovieVideos(movieId: Int) {
+        print("Fetch Movie Video Api cagrisi baslatildi. movieId: \(movieId)")
+        
+        self.movieVideosUseCase?.fetchMovieVideos(movieId: movieId)?
+            .sink(receiveCompletion: { [weak self] completion in
+                guard let self = self else { return }
+                if case .failure(let error) = completion {
+                    print("FetchMovieVideos Api hatasi: \(error.localizedDescription)")
+                    self.output.send(.errorOccurred("Video yuklenirken hata olustu"))
+                }
+            }, receiveValue: { [weak self] bestTrailer in
+                guard let self = self else { return }
+                if let trailer = bestTrailer, let url = trailer.youtubeURL {
+                    print("Best trailer YouTube URL: \(url.absoluteString)")
+                    self.output.send(.movieVideos([trailer]))
+                } else {
+                    print("No valid trailer found")
+                    self.output.send(.errorOccurred("Trailer bulunamadı"))                }
+            })
+            .store(in: &cancellables)
+    }
 }
 
 
@@ -110,6 +137,8 @@ extension MovieDetailsVMImpl {
                 self.fetchMovieDetails(movieId: movieId)
             case .fetchMovieCredits(let movieId):
                 self.fetchMovieCredits(movieId: movieId)
+            case .fetchMovieVideos(movieId: let movieId):
+                self.fetchMovieVideos(movieId: movieId)
             }
         }.store(in: &cancellables)
         return output.eraseToAnyPublisher()
