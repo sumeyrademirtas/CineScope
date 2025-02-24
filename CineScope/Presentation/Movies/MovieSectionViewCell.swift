@@ -49,7 +49,8 @@ class MovieSectionViewCell: UICollectionViewCell {
         innerCollectionView.dataSource = self
         innerCollectionView.delegate = self
         innerCollectionView.register(MoviePosterViewCell.self, forCellWithReuseIdentifier: MoviePosterViewCell.reuseIdentifier)
-        innerCollectionView.backgroundColor = .gray
+//        innerCollectionView.backgroundColor = .gray
+        innerCollectionView.backgroundColor = UIColor(hue: 0.65, saturation: 0.27, brightness: 0.18, alpha: 1.00)
         innerCollectionView.alwaysBounceHorizontal = true
         
         NSLayoutConstraint.activate([
