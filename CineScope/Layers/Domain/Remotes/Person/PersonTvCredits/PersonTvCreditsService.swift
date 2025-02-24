@@ -10,7 +10,7 @@ import Combine
 import Moya
 
 protocol PersonTvCreditsService {
-    func getPersonTvCredits(api: PersonTvCreditsApi) -> AnyPublisher<PersonTvCredits?, Error>?
+    func getPersonTvCredits(api: PersonTvCreditsApi) -> AnyPublisher<PersonTvCreditsResponse?, Error>?
 }
 
 struct PersonTvCreditsServiceImpl: PersonTvCreditsService {
@@ -23,7 +23,7 @@ struct PersonTvCreditsServiceImpl: PersonTvCreditsService {
 }
 
 extension PersonTvCreditsServiceImpl {
-    func getPersonTvCredits(api: PersonTvCreditsApi) -> AnyPublisher<PersonTvCredits?, any Error>? {
+    func getPersonTvCredits(api: PersonTvCreditsApi) -> AnyPublisher<PersonTvCreditsResponse?, any Error>? {
         return Future { promise in
             provider.request(api) { result in
                 switch result {
@@ -34,7 +34,7 @@ extension PersonTvCreditsServiceImpl {
                     }
                     do {
                         // JSON verisini decode et ve unwrap yap
-                        let decodedResponse = try JSONDecoder().decode(PersonTvCredits.self, from: response.data)
+                        let decodedResponse = try JSONDecoder().decode(PersonTvCreditsResponse.self, from: response.data)
                         promise(.success(decodedResponse)) // Başarıyla promise gönder
                     } catch {
                         promise(.failure(error)) // JSON decode hatası
