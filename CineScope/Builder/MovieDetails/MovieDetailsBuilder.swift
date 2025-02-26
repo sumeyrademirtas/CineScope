@@ -27,7 +27,9 @@ struct MovieDetailsBuilderImpl: MovieDetailsBuilder {
 
         let vc = MovieDetailsVC(viewModel: viewModel, provider: provider)
         vc.configure(movieId: movieId) // 🔥 Burada configure çağrılıyor
+        let navController = UINavigationController(rootViewController: vc)
 
-        return vc
+
+        return navController
     }
 }
