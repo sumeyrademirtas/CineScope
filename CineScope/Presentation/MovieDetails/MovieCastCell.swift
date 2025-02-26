@@ -22,6 +22,10 @@ class MovieCastCell: UICollectionViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
+    
+    //Clousure to notify selection events
+    var onCastSelected: ((Cast) -> Void)?
+
 
     private let horizontalCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -90,4 +94,16 @@ extension MovieCastCell: UICollectionViewDelegate, UICollectionViewDataSource {
         cell.configure(with: castList[indexPath.row])
         return cell
     }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let selectedCast = castList[indexPath.row]
+        guard let castId = selectedCast.id else {
+                print("Cast ID is nil")
+                return
+            }
+        print("Inner Cell Tıklandı: \(selectedCast.name ?? "Unknown") - ID: \(String(describing: selectedCast.id))")
+        onCastSelected?(selectedCast)
+    }
+    
+    
 }
