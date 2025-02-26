@@ -127,6 +127,9 @@ extension MovieDetailsVC {
             switch event {
             case .didToggleFavorite(let movieId, let isFavorite):
                 print("Favori Durumu Değişti: MovieID: \(movieId), Favori: \(isFavorite)")
+            case .didSelectCast(let personId):
+                print("Did select cast with personId: \(personId)")
+                self?.navigateToCastDetails(personId: personId)
             }
         }.store(in: &cancellables)
     }
@@ -139,5 +142,21 @@ extension MovieDetailsVC {
         let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
+    }
+}
+
+// ✅ **Movie Details Sayfasına Geçiş Yap**
+extension MovieDetailsVC {
+    func navigateToCastDetails(personId: Int) {
+        dismiss(animated: true) { [weak self] in
+            let personDetailsVC = PersonDetailsBuilderImpl().build(personId: personId)
+            personDetailsVC.modalPresentationStyle = .pageSheet
+            personDetailsVC.modalTransitionStyle = .crossDissolve
+            if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = scene.windows.first,
+               let rootVC = window.rootViewController {
+                rootVC.present(personDetailsVC, animated: true)
+            }
+        }
     }
 }
