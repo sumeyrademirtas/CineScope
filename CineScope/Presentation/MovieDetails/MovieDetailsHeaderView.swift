@@ -44,8 +44,6 @@ class MovieDetailsHeaderView: UICollectionReusableView {
         addSubview(titleLabel)
         addSubview(trailerPlayerView)
         
-        trailerPlayerView.layer.borderWidth = 2
-        trailerPlayerView.layer.borderColor = UIColor.black.cgColor // Siyah çerçeve ekledik
         trailerPlayerView.layer.cornerRadius = 10
         trailerPlayerView.clipsToBounds = true
 
