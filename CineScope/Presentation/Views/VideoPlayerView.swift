@@ -39,15 +39,9 @@ class VideoPlayerView: UIView, WKNavigationDelegate {
     }
 
     func loadYouTubeVideo(videoID: String) {
-        let embedHTML = """
-        <html>
-        <body style="margin:0px;padding:0px;overflow:hidden;background-color:black;">
-        <iframe width="100%" height="100%" src="https://www.youtube.com/embed/\(videoID)?playsinline=1&autoplay=1&controls=1&modestbranding=1&rel=0&showinfo=0"
-        frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
-        </iframe>
-        </body>
-        </html>
-        """
-        webView.loadHTMLString(embedHTML, baseURL: nil)
+        guard let url = URL(string: "https://www.youtube.com/embed/\(videoID)?playsinline=1&autoplay=1&controls=1&modestbranding=1&rel=0&showinfo=0") else {
+             return
+        }
+        webView.load(URLRequest(url: url))
     }
 }
