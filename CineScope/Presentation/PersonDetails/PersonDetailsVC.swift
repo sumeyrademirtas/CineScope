@@ -29,7 +29,7 @@ class PersonDetailsVC: BaseViewController {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        cv.backgroundColor = .orange
+        cv.backgroundColor = .brandDarkBlue
         cv.translatesAutoresizingMaskIntoConstraints = false
         return cv
     }()
@@ -53,6 +53,15 @@ class PersonDetailsVC: BaseViewController {
         self.personId = personId
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // Navigation bar'ı gizle
+        navigationController?.setNavigationBarHidden(true, animated: animated)
+        
+        // Ustteki kodu yazinca kaydirarak geri gitme ozelligi calismiyordu. onun da calismasi icin alttaki kodu ekledik
+        navigationController?.interactivePopGestureRecognizer?.delegate = nil
+    }
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -70,6 +79,8 @@ class PersonDetailsVC: BaseViewController {
             inputVM.send(.fetchPersonMovieCredits(personId: id))
             inputVM.send(.fetchPersonTvCredits(personId: id))
         }
+        
+        
     }
 }
 
