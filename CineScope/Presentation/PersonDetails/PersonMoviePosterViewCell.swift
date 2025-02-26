@@ -30,7 +30,7 @@ class PersonMoviePosterViewCell: UICollectionViewCell {
     }
     
     private func setupUI() {
-        contentView.backgroundColor = .blue
+        contentView.backgroundColor = .brandDarkBlue
         contentView.addSubview(posterImageView)
         NSLayoutConstraint.activate([
             posterImageView.topAnchor.constraint(equalTo: contentView.topAnchor),

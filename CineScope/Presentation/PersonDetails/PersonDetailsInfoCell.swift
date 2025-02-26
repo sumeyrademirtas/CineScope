@@ -57,7 +57,7 @@ class PersonDetailsInfoCell: UICollectionViewCell {
     }
 
     private func setupUI() {
-        contentView.backgroundColor = .darkGray
+        contentView.backgroundColor = .brandDarkBlue
 
         contentView.addSubview(posterImageView)
         contentView.addSubview(rightStackView)

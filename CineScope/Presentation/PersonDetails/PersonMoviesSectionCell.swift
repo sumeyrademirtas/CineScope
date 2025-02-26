@@ -39,7 +39,7 @@ class PersonMoviesSectionCell: UICollectionViewCell {
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     private func setupUI() {
-        contentView.backgroundColor = .systemPink
+        contentView.backgroundColor = .brandDarkBlue
         contentView.addSubview(titleLabel)
         contentView.addSubview(innerCollectionView)
         innerCollectionView.dataSource = self
