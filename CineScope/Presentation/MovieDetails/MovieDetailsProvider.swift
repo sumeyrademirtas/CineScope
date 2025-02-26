@@ -37,6 +37,7 @@ extension MovieDetailsProviderImpl {
     enum MovieDetailsProviderOutput {
         // FIXME: -
         case didToggleFavorite(movieId: Int, isFavorite: Bool)
+        case didSelectCast(castId: Int)
     }
     
     enum MovieDetailsProviderInput {
@@ -155,6 +156,15 @@ extension MovieDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewDa
             ) as! MovieCastCell
             // Konfigürasyon: cell içerisinde castList'in tamamı gösterilecek
             cell.configure(with: castList)
+            // Closure'u ayarla: Tıklanan cast bilgisini provider output'una gönderiyoruz.
+            cell.onCastSelected = { [weak self] selectedCast in
+                if let castId = selectedCast.id {
+                    print("Delegated Selected Cast: \(selectedCast.name), ID: \(castId)")
+                    self?.output.send(MovieDetailsProviderImpl.MovieDetailsProviderOutput.didSelectCast(castId: castId))
+                } else {
+                    print("Cast ID bulunamadı!")
+                }
+            }
             return cell
         }
     }
