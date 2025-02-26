@@ -68,6 +68,11 @@ extension PersonDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewD
         self.collectionView?.delegate = self
         self.collectionView?.dataSource = self
         // Register cells
+        self.collectionView?.register(
+            PersonDetailsHeaderView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: PersonDetailsHeaderView.reuseIdentifier
+        )
         collectionView.register(PersonDetailsInfoCell.self,
                                 forCellWithReuseIdentifier: PersonDetailsInfoCell.reuseIdentifier)
         collectionView.register(PersonMoviesSectionCell.self,
@@ -116,6 +121,47 @@ extension PersonDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewD
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PersonTvSectionCell.reuseIdentifier, for: indexPath) as! PersonTvSectionCell
             cell.configure(with: tvCredits)
             return cell
+        }
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        viewForSupplementaryElementOfKind kind: String,
+        at indexPath: IndexPath
+    ) -> UICollectionReusableView {
+        guard kind == UICollectionView.elementKindSectionHeader else {
+            return UICollectionReusableView()
+        }
+
+        // Sadece en üstte (indexPath.section == 0) header göstermek istiyoruz.
+        if indexPath.section == 0 {
+            let header = collectionView.dequeueReusableSupplementaryView(
+                ofKind: UICollectionView.elementKindSectionHeader,
+                withReuseIdentifier: PersonDetailsHeaderView.reuseIdentifier,
+                for: indexPath
+            ) as! PersonDetailsHeaderView
+
+            // Kişinin adıyla header'ı configure et
+            if let firstSection = dataList.first, case .info(let rows) = firstSection,
+               let firstRow = rows.first, case .personInfo(let person) = firstRow {
+                header.configure(with: person.name)
+            }
+
+            return header
+        } else {
+            return UICollectionReusableView() // Diğer section'larda header istemiyoruz
+        }
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        referenceSizeForHeaderInSection section: Int
+    ) -> CGSize {
+        if section == 0 {
+            return CGSize(width: collectionView.frame.width, height: 50) // Header için uygun yükseklik
+        } else {
+            return CGSize(width: 0, height: 0) // Diğer section'lar header kullanmayacak
         }
     }
 
