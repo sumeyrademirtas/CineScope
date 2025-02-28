@@ -8,7 +8,11 @@
 import UIKit
 import Combine
 
-class MoviesVC: BaseViewController { // FIXME: BaseClass kontrolu yap. BaseClass atacak mahsun
+class MoviesVC: BaseViewController {
+    
+    deinit {
+        print("Destroy MoviesVC") // MARK: - Memory Leak Check
+    }
 
     // MARK: - Types
     typealias P = MovieListProvider
