@@ -11,6 +11,8 @@ class PersonMoviesSectionCell: UICollectionViewCell {
     static let reuseIdentifier = "PersonMoviesSectionCell"
 
     private var personMovies: [PersonMovieCredits] = []
+    
+    var onMovieSelected: ((Int) -> Void)?
 
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -89,5 +91,10 @@ extension PersonMoviesSectionCell: UICollectionViewDataSource, UICollectionViewD
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 100, height: 150) // Poster boyutu
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let movie = personMovies[indexPath.item]
+        onMovieSelected?(movie.id)
     }
 }
