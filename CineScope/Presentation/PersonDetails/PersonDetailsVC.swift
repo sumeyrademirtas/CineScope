@@ -10,6 +10,10 @@ import Foundation
 import UIKit
 
 class PersonDetailsVC: BaseViewController {
+    
+    deinit {
+        print("Destroy PersonDetailsVC") // MARK: - Memory Leak Check
+    }
     // MARK: - Types
 
     typealias P = PersonDetailsProvider
@@ -144,8 +148,9 @@ extension PersonDetailsVC {
 extension PersonDetailsVC {
     private func navigateToMovieDetails(movieId: Int) {
            let movieDetailsVC = MovieDetailsBuilderImpl().build(movieId: movieId)
-           movieDetailsVC.modalPresentationStyle = .fullScreen
+           movieDetailsVC.modalPresentationStyle = .pageSheet
            movieDetailsVC.modalTransitionStyle = .crossDissolve
            self.present(movieDetailsVC, animated: true, completion: nil)
        }
 }
+
