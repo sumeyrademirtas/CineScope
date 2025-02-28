@@ -9,6 +9,11 @@ import Combine
 import UIKit
 
 class SearchVC: BaseViewController {
+    
+    deinit {
+        print("Destroy SearchVC") // MARK: - Memory Leak Check
+    }
+    
     // MARK: - Types
 
     typealias P = SearchListProvider
