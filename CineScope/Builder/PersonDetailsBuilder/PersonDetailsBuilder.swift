@@ -33,8 +33,8 @@ struct PersonDetailsBuilderImpl: PersonDetailsBuilder {
         let vc = PersonDetailsVC(viewModel: viewModel, provider: provider)
         
         vc.configure(personId: personId) // 🔥 Burada configure çağrılıyor
+        let navController = UINavigationController(rootViewController: vc)
         
-        
-        return vc
+        return navController
     }
 }
