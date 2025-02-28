@@ -10,6 +10,11 @@ import Foundation
 import UIKit
 
 class MovieDetailsVC: BaseViewController {
+    
+    deinit {
+        print("Destroy MovieDetailsVC") // MARK: - Memory Leak Check
+    }
+    
     // MARK: - Types
 
     typealias P = MovieDetailsProvider
@@ -145,27 +150,13 @@ extension MovieDetailsVC {
     }
 }
 
-// ✅ **Movie Details Sayfasına Geçiş Yap**
-//extension MovieDetailsVC {
-//    func navigateToCastDetails(personId: Int) {
-//        dismiss(animated: true) { [weak self] in
-//            let personDetailsVC = PersonDetailsBuilderImpl().build(personId: personId)
-//            personDetailsVC.modalPresentationStyle = .pageSheet
-//            personDetailsVC.modalTransitionStyle = .crossDissolve
-//            if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-//               let window = scene.windows.first,
-//               let rootVC = window.rootViewController {
-//                rootVC.present(personDetailsVC, animated: true)
-//            }
-//        }
-//    }
-//}
+
 
 extension MovieDetailsVC {
-    func navigateToCastDetails(personId: Int) {
+    private func navigateToCastDetails(personId: Int) {
         let personDetailsVC = PersonDetailsBuilderImpl().build(personId: personId)
-        // Push the view controller onto the navigation stack.
-        self.navigationController?.pushViewController(personDetailsVC, animated: true)
+        personDetailsVC.modalPresentationStyle = .pageSheet
+        personDetailsVC.modalTransitionStyle = .crossDissolve
+        self.present(personDetailsVC, animated: true, completion: nil)
     }
 }
-
