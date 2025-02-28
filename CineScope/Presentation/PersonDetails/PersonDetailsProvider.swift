@@ -112,6 +112,12 @@ extension PersonDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewD
             }
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PersonMoviesSectionCell.reuseIdentifier, for: indexPath) as! PersonMoviesSectionCell
             cell.configure(with: movieCredits)
+            
+            //
+            cell.onMovieSelected = { [weak self] movieId in
+                print("Movie with ID \(movieId) selected from person's credits.")
+                self?.output.send(.didSelectMovie(movieId: movieId)) }
+                    
             return cell
 
         case .tvShows(let rows):
