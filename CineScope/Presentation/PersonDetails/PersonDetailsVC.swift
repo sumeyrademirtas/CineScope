@@ -43,7 +43,6 @@ class PersonDetailsVC: BaseViewController {
     init(viewModel: V, provider: any P /* , personId: Int */ ) {
         self.viewModel = viewModel
         self.provider = provider
-//        self.personId = personId
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -71,7 +70,6 @@ class PersonDetailsVC: BaseViewController {
     override func viewDidLoad() {
         view.backgroundColor = .white
         super.viewDidLoad()
-        print("PersonDetailsVC viewDidLoad")
 
         setupUI()
         binding()
