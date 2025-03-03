@@ -45,6 +45,12 @@ class PersonMoviePosterViewCell: UICollectionViewCell {
         loadImage(from: credits.fullPosterURL)
     }
     
+    func configure() {
+       
+    }
+    
+    
+    
     private func loadImage(from urlString: String) {
         guard let url = URL(string: urlString) else {
             posterImageView.image = UIImage(named: "placeholder")

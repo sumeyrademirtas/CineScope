@@ -30,10 +30,21 @@ class MovieDetailsContentCell: UICollectionViewCell {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14)
         label.textColor = .white
-        label.numberOfLines = 0
+        label.numberOfLines = 8
         label.textAlignment = .natural
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
+    }()
+    
+    // More Button (Eğer 300+ kelime varsa gösterilecek)
+    private let moreButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Read More", for: .normal)
+        button.setTitleColor(.systemBlue, for: .normal) // Mavi renk
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .bold)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.isHidden = true // ✅ Başlangıçta gizli olacak
+        return button
     }()
 
     //Genre
@@ -119,6 +130,7 @@ class MovieDetailsContentCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
+        moreButton.addTarget(self, action: #selector(moreButtonTapped), for: .touchUpInside)
     }
 
     required init?(coder: NSCoder) {
@@ -136,6 +148,7 @@ class MovieDetailsContentCell: UICollectionViewCell {
         // Info stack'e genre + overview ekle
         infoStackView.addArrangedSubview(genreLabel)
         infoStackView.addArrangedSubview(overviewLabel)
+        infoStackView.addArrangedSubview(moreButton)
 
         // Horizontal stack'e poster + info ekle
         horizontalStackView.addArrangedSubview(posterImageView)
@@ -162,29 +175,61 @@ class MovieDetailsContentCell: UICollectionViewCell {
     }
 
     // MARK: - Configure
-    func configure(with overview: String, genres: String, posterURL: String?, voteAverage: CGFloat, releaseDate: String, runtime: String) {
-        overviewLabel.text = overview
-        genreLabel.text = genres
-        ratingProgressView.setProgress(voteAverage: voteAverage) // Oranı ayarla
-        loadImage(from: posterURL)
+//    func configure(with overview: String, genres: String, posterURL: String?, voteAverage: CGFloat, releaseDate: String, runtime: String) {
+//        overviewLabel.text = overview
+//        genreLabel.text = genres
+//        ratingProgressView.setProgress(voteAverage: voteAverage) // Oranı ayarla
+//        loadImage(from: posterURL)
+//        
+//        // Eğer 300+ varsa More butonunu göster
+//        if overview.count > 250 {
+//                    moreButton.isHidden = false
+//                } else {
+//                    moreButton.isHidden = true
+//                }
+//
+//        
+//        // SF Symbol ile Release Date Label
+//        let calendarIcon = NSTextAttachment()
+//        calendarIcon.image = UIImage(systemName: "calendar")?.withTintColor(.white, renderingMode: .alwaysOriginal)
+//        calendarIcon.bounds = CGRect(x: 0, y: -2, width: 14, height: 14)
+//
+//        let releaseAttributedString = NSMutableAttributedString(attachment: calendarIcon)
+//        releaseAttributedString.append(NSAttributedString(string: " \(releaseDate)"))
+//        releaseDateLabel.attributedText = releaseAttributedString
+//
+//        // SF Symbol ile Runtime Label
+//        let clockIcon = NSTextAttachment()
+//        clockIcon.image = UIImage(systemName: "clock")?.withTintColor(.white, renderingMode: .alwaysOriginal)
+//        clockIcon.bounds = CGRect(x: 0, y: -2, width: 14, height: 14)
+//
+//        let runtimeAttributedString = NSMutableAttributedString(attachment: clockIcon)
+//        runtimeAttributedString.append(NSAttributedString(string: " \(runtime)"))
+//        runtimeLabel.attributedText = runtimeAttributedString
+//    }
+    
+
+    func configure(with movie: MovieDetails) {
+        overviewLabel.text = movie.overview
+        genreLabel.text = movie.genres?.map { $0.name }.joined(separator: ", ") ?? "N/A"
+        ratingProgressView.setProgress(voteAverage: CGFloat(movie.voteAverage))
+        loadImage(from: movie.fullPosterURL)
+        releaseDateLabel.attributedText = createAttributedText(iconName: "calendar", text: movie.releaseDate)
+        runtimeLabel.attributedText = createAttributedText(iconName: "clock", text: movie.formattedRuntime)
         
-        // SF Symbol ile Release Date Label
-        let calendarIcon = NSTextAttachment()
-        calendarIcon.image = UIImage(systemName: "calendar")?.withTintColor(.white, renderingMode: .alwaysOriginal)
-        calendarIcon.bounds = CGRect(x: 0, y: -2, width: 14, height: 14)
+        // Eğer overview 250 karakterden uzunsa "More" butonunu göster
+        moreButton.isHidden = movie.overview.count <= 250
+    }
 
-        let releaseAttributedString = NSMutableAttributedString(attachment: calendarIcon)
-        releaseAttributedString.append(NSAttributedString(string: " \(releaseDate)"))
-        releaseDateLabel.attributedText = releaseAttributedString
-
-        // SF Symbol ile Runtime Label
-        let clockIcon = NSTextAttachment()
-        clockIcon.image = UIImage(systemName: "clock")?.withTintColor(.white, renderingMode: .alwaysOriginal)
-        clockIcon.bounds = CGRect(x: 0, y: -2, width: 14, height: 14)
-
-        let runtimeAttributedString = NSMutableAttributedString(attachment: clockIcon)
-        runtimeAttributedString.append(NSAttributedString(string: " \(runtime)"))
-        runtimeLabel.attributedText = runtimeAttributedString
+    // MARK: - Yardımcı Fonksiyon
+    private func createAttributedText(iconName: String, text: String) -> NSAttributedString {
+        let iconAttachment = NSTextAttachment()
+        iconAttachment.image = UIImage(systemName: iconName)?.withTintColor(.white, renderingMode: .alwaysOriginal)
+        iconAttachment.bounds = CGRect(x: 0, y: -2, width: 14, height: 14)
+        
+        let attributedText = NSMutableAttributedString(attachment: iconAttachment)
+        attributedText.append(NSAttributedString(string: " \(text)"))
+        return attributedText
     }
 
     // MARK: - Load Image
@@ -205,4 +250,40 @@ class MovieDetailsContentCell: UICollectionViewCell {
             }
         }.resume()
     }
+    
+    // MARK: - More Button Action
+       @objc private func moreButtonTapped() {
+           let moreDetailsVC = MoreDetailsVC(text: overviewLabel.text ?? "")
+           moreDetailsVC.modalPresentationStyle = .formSheet
+           if let sheet = moreDetailsVC.sheetPresentationController {
+               sheet.detents = [
+                           .custom(resolver: { context in
+                               return UIScreen.main.bounds.height / 3 // ✅ Ekran yüksekliğinin 1/3’ü
+                           })
+                       ]
+               sheet.preferredCornerRadius = 16
+               
+               // Yukarı çekme çubuğu görünmesin
+               sheet.prefersGrabberVisible = false
+               
+               // Sayfa yukarı kaydırılmasın
+               moreDetailsVC.isModalInPresentation = false
+           }
+
+           if let parentVC = findViewController() {
+               parentVC.present(moreDetailsVC, animated: true)
+           }
+       }
+
+       // MARK: - Find Parent ViewController
+       private func findViewController() -> UIViewController? {
+           var responder: UIResponder? = self
+           while let nextResponder = responder?.next {
+               if let viewController = nextResponder as? UIViewController {
+                   return viewController
+               }
+               responder = nextResponder
+           }
+           return nil
+       }
 }
