@@ -137,12 +137,7 @@ extension MovieDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewDa
                 fatalError("No movie info available")
             }
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieDetailsContentCell.reuseIdentifier, for: indexPath) as! MovieDetailsContentCell
-            cell.configure(with: movie.overview,
-                           genres: movie.genres?.map { $0.name }.joined(separator: ", ") ?? "N/A",
-                           posterURL: movie.fullPosterURL,
-                           voteAverage: movie.voteAverage,
-                           releaseDate: movie.releaseDate,
-                           runtime: movie.formattedRuntime)
+            cell.configure(with: movie)
             return cell
         case .cast(let rows):
             guard let row = rows.first, case .movieCast(let cast) = row else {
