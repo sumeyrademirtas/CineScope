@@ -49,9 +49,6 @@ extension PersonDetailsVMImpl {
 
     enum PersonDetailsVMOutput {
         case isLoading(Bool)
-//        case personDetails(PersonDetails)
-//        case personMovieCredits([PersonMovieCredits])
-//        case personTvCredits([PersonTvCredits])
         case dataSource(section: [SectionType])
         case errorOccured(String)
     }
