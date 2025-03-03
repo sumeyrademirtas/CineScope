@@ -30,7 +30,7 @@ extension MovieDetailsApi: TargetType {
     
     var task: Moya.Task {
         switch self {
-        case .getMovieDetails(movieId: let movieId):
+        case .getMovieDetails:
             var params: [String: Any] = [:]
             params["api_key"] = constants.apiKey
             params["language"] = "en-US"
