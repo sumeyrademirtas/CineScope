@@ -44,8 +44,8 @@ class PersonTvSectionCell: UICollectionViewCell {
         contentView.addSubview(innerCollectionView)
         innerCollectionView.dataSource = self
         innerCollectionView.delegate = self
-        innerCollectionView.register(PersonTvPosterViewCell.self,
-                                     forCellWithReuseIdentifier: PersonTvPosterViewCell.reuseIdentifier) // Poster cell
+        innerCollectionView.register(PersonMediaPosterViewCell.self,
+                                     forCellWithReuseIdentifier: PersonMediaPosterViewCell.reuseIdentifier) // Poster cell
 
         // Auto Layout
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -76,9 +76,9 @@ extension PersonTvSectionCell: UICollectionViewDataSource, UICollectionViewDeleg
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: "PersonTvPosterViewCell",
-            for: indexPath) as? PersonTvPosterViewCell else {
-            fatalError("Cannot dequeue PersonTvPosterViewCell")
+            withReuseIdentifier: "PersonMediaPosterViewCell",
+            for: indexPath) as? PersonMediaPosterViewCell else {
+            fatalError("Cannot dequeue PersonMediaPosterViewCell")
         }
         let personTv = personTvs[indexPath.item]
         cell.configure(with: personTv) // Poster’ı yükleyen bir metot
