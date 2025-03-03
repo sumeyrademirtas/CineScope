@@ -75,8 +75,8 @@ extension PersonDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewD
         )
         collectionView.register(PersonDetailsInfoCell.self,
                                 forCellWithReuseIdentifier: PersonDetailsInfoCell.reuseIdentifier)
-        collectionView.register(PersonMoviesSectionCell.self,
-                                forCellWithReuseIdentifier: PersonMoviesSectionCell.reuseIdentifier)
+        collectionView.register(PersonMovieSectionCell.self,
+                                forCellWithReuseIdentifier: PersonMovieSectionCell.reuseIdentifier)
         collectionView.register(PersonTvSectionCell.self,
                                 forCellWithReuseIdentifier: PersonTvSectionCell.reuseIdentifier)
 
@@ -110,7 +110,7 @@ extension PersonDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewD
             guard let row = rows.first, case .personMovieCredits(let movieCredits) = row else {
                 fatalError("No movie credits available")
             }
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PersonMoviesSectionCell.reuseIdentifier, for: indexPath) as! PersonMoviesSectionCell
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PersonMovieSectionCell.reuseIdentifier, for: indexPath) as! PersonMovieSectionCell
             cell.configure(with: movieCredits)
             
             //
