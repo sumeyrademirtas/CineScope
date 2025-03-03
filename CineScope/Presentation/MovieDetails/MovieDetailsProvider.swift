@@ -9,21 +9,18 @@ import Combine
 import Foundation
 import UIKit
 
-protocol MovieDetailsProvider: CollectionViewProvider where T == MovieDetails, I == IndexPath {
+protocol MovieDetailsProvider: CollectionViewProvider where T == MovieDetailsVMImpl.SectionType, I == IndexPath {
     func activityHandler(input: AnyPublisher<MovieDetailsProviderImpl.MovieDetailsProviderInput, Never>) -> AnyPublisher<MovieDetailsProviderImpl.MovieDetailsProviderOutput, Never>
 }
 
 final class MovieDetailsProviderImpl: NSObject, MovieDetailsProvider {
-    typealias T = MovieDetails
+    typealias T = MovieDetailsVMImpl.SectionType
     typealias I = IndexPath
-    
-    var dataList: [MovieDetails] = []
-    var castList: [Cast] = [] // Yeni: Cast verilerini saklamak için
-    var trailer: [MovieVideo] = []
-
+    var dataList: [MovieDetailsVMImpl.SectionType] = []
     
     // binding
     private let output = PassthroughSubject<MovieDetailsProviderOutput, Never>()
+    
     private var cancellables = Set<AnyCancellable>()
     
     private weak var collectionView: UICollectionView?
@@ -34,18 +31,15 @@ final class MovieDetailsProviderImpl: NSObject, MovieDetailsProvider {
 // MARK: - EventType
 
 extension MovieDetailsProviderImpl {
+    enum MovieDetailsProviderInput {
+        case setupUI(collectionView: UICollectionView)
+        case prepareCollectionView(data: [MovieDetailsVMImpl.SectionType])
+    }
+    
     enum MovieDetailsProviderOutput {
         // FIXME: -
         case didToggleFavorite(movieId: Int, isFavorite: Bool)
         case didSelectCast(castId: Int)
-    }
-    
-    enum MovieDetailsProviderInput {
-        case setupUI(collectionView: UICollectionView)
-        case prepareCollectionView(data: [MovieDetails])
-        case updateCast(cast: [Cast]) // Yeni: Cast verilerini güncellemek için
-        case updateTrailer(video: [MovieVideo])
-
     }
 }
 
@@ -60,11 +54,6 @@ extension MovieDetailsProviderImpl {
                 self.setupCollectionView(collectionView: collectionView)
             case .prepareCollectionView(let data):
                 self.prepareCollectionView(data: data)
-            case .updateCast(cast: let cast):
-                self.updateCastList(cast: cast)
-
-            case .updateTrailer(video: let video):
-                self.updateTrailer(video: video)
             }
         }.store(in: &cancellables)
         return output.eraseToAnyPublisher()
@@ -85,85 +74,86 @@ extension MovieDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewDa
             withReuseIdentifier: MovieDetailsHeaderView.reuseIdentifier
         )
         self.collectionView?.register(
-               MovieDetailsContentCell.self,
-               forCellWithReuseIdentifier: MovieDetailsContentCell.reuseIdentifier
-           )
-        // Yeni: MovieCastCell kaydı
+            TrailerViewCell.self,
+            forCellWithReuseIdentifier: TrailerViewCell.reuseIdentifier
+        )
+        self.collectionView?.register(
+            MovieDetailsContentCell.self,
+            forCellWithReuseIdentifier: MovieDetailsContentCell.reuseIdentifier
+        )
         self.collectionView?.register(
             MovieCastCell.self,
             forCellWithReuseIdentifier: MovieCastCell.reuseIdentifier
         )
-
+        print("MovieDetail CollectionView setup completed.")
     }
-    
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-           return 2 // Section 0: Film Detayları, Section 1: Cast
-    }
-    
-    // Layout: Details cell height and Cast cell height can be adjusted accordingly.
-    func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        sizeForItemAt indexPath: IndexPath) -> CGSize {
-        if indexPath.section == 0 {
-            return CGSize(width: collectionView.frame.width, height: 300)
-        } else {
-            // Cast cell
-            return CGSize(width: collectionView.frame.width, height: 240)
-        }
+        return dataList.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if section == 0 {
-            print("📢 Details Section Item Count: \(dataList.isEmpty ? 0 : 1)")
-            return dataList.isEmpty ? 0 : 1
-        } else {
-            print("📢 Cast Section Item Count: \(castList.isEmpty ? 0 : 1)")
-            return 1 // FIXME: ---
-        }
+        return 1
     }
     
-    // 🔹 Cell oluşturma - Şimdilik boş bırakıyorum çünkü detayları ileride dolduracağız.
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
+        let width = collectionView.frame.width
+        
+        let height: CGFloat
+        switch indexPath.section {
+        case 0:
+            height = 240
+        case 1:
+            height = 300
+        case 2:
+            height = 240
+        default:
+            height = 240 // Varsayılan değer
+        }
+        return CGSize(width: width, height: height)
+    }
+
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if indexPath.section == 0 {
-            // Film Detayları Cell
-            let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: MovieDetailsContentCell.reuseIdentifier,
-                for: indexPath
-            ) as! MovieDetailsContentCell
-
-            if let movieDetails = dataList.first {
-                print("✅ Configuring Details Cell with: \(movieDetails.overview)")
-                cell.configure(
-                    with: movieDetails.overview,
-                    genres: movieDetails.genres?.map { $0.name }.joined(separator: ", ") ?? "N/A",
-                    posterURL: movieDetails.fullPosterURL,
-                    voteAverage: movieDetails.voteAverage, // Eklenen parametre
-                    releaseDate: movieDetails.releaseDate,
-                    runtime: movieDetails.formattedRuntime
-                )
-            } else {
-                print("⚠️ dataList.first() is empty!")
+        let section = dataList[indexPath.section]
+        switch section {
+        case .video(let rows):
+            guard let row = rows.first, case .movieVideo(let videos) = row else {
+                fatalError("No video available")
             }
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrailerViewCell.reuseIdentifier, for: indexPath) as! TrailerViewCell
+            
+            // Örnek: Sadece ilk videoyu oynatmak istiyorsanız:
+            if let firstVideo = videos.first {
+                cell.loadYouTubeVideo(videoID: firstVideo.key)
+            }
+            
             return cell
-        } else {
-            print("🔥 Cast cell for index \(indexPath.row)")
+        case .info(let rows):
+            guard let row = rows.first, case .movieInfo(let movie) = row else {
+                fatalError("No movie info available")
+            }
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieDetailsContentCell.reuseIdentifier, for: indexPath) as! MovieDetailsContentCell
+            cell.configure(with: movie.overview,
+                           genres: movie.genres?.map { $0.name }.joined(separator: ", ") ?? "N/A",
+                           posterURL: movie.fullPosterURL,
+                           voteAverage: movie.voteAverage,
+                           releaseDate: movie.releaseDate,
+                           runtime: movie.formattedRuntime)
+            return cell
+        case .cast(let rows):
+            guard let row = rows.first, case .movieCast(let cast) = row else {
+                fatalError("No cast available")
+            }
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieCastCell.reuseIdentifier, for: indexPath) as! MovieCastCell
+            cell.configure(with: cast)
+            cell.onCastSelected = { [weak self] castId in
+                print("Cast with ID \(castId) selected from movies cast.")
+                self?.output.send(.didSelectCast(castId: castId))
 
-            // Cast Cell (MovieCastCell - container cell that holds horizontal collection view for cast photos)
-            let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: MovieCastCell.reuseIdentifier,
-                for: indexPath
-            ) as! MovieCastCell
-            // Konfigürasyon: cell içerisinde castList'in tamamı gösterilecek
-            cell.configure(with: castList)
-            // Closure'u ayarla: Tıklanan cast bilgisini provider output'una gönderiyoruz.
-            cell.onCastSelected = { [weak self] selectedCast in
-                if let castId = selectedCast.id {
-                    print("Delegated Selected Cast: \(selectedCast.name), ID: \(castId)")
-                    self?.output.send(MovieDetailsProviderImpl.MovieDetailsProviderOutput.didSelectCast(castId: castId))
-                } else {
-                    print("Cast ID bulunamadı!")
-                }
             }
             return cell
         }
@@ -179,7 +169,7 @@ extension MovieDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewDa
             return UICollectionReusableView()
         }
         
-        // Sadece section == 0 için header göster
+        // Sadece section == 0 için header göstermek istiyorsanız
         if indexPath.section == 0 {
             let header = collectionView.dequeueReusableSupplementaryView(
                 ofKind: UICollectionView.elementKindSectionHeader,
@@ -187,15 +177,23 @@ extension MovieDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewDa
                 for: indexPath
             ) as! MovieDetailsHeaderView
             
-//            if let movieDetails = dataList.first {
-//                header.configure(with: movieDetails.title, trailerVideoID: )
-//            }
-            if let movieDetails = dataList.first {
-                // Trailer array'inde uygun trailer varsa, YouTube URL'sinin video ID'sini çıkarıyoruz.
-                // Örneğin: "https://www.youtube.com/watch?v=Kp6WlyxBHBM" → "Kp6WlyxBHBM"
-                let trailerVideoID = self.trailer.first?.youtubeURL?.absoluteString.components(separatedBy: "v=").last
-                print("Header configuring with title: \(movieDetails.title) and trailer video ID: \(String(describing: trailerVideoID))")
-                header.configure(with: movieDetails.title, trailerVideoID: trailerVideoID)
+            // 1) dataList içinde .info section'ı bul
+            if let infoSection = dataList.first(where: {
+                if case .info = $0 { return true }
+                return false
+            }) {
+                // 2) O section'ın row'larını al
+                switch infoSection {
+                case .info(let rows):
+                    // 3) rows.first -> .movieInfo(let movie) mi?
+                    if let firstRow = rows.first,
+                       case .movieInfo(let movie) = firstRow {
+                        // 4) Başlığı header'a set et
+                        header.configure(with: movie.title)
+                    }
+                default:
+                    break
+                }
             }
             
             return header
@@ -205,16 +203,26 @@ extension MovieDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewDa
         }
     }
     
-    func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        referenceSizeForHeaderInSection section: Int) -> CGSize {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        referenceSizeForHeaderInSection section: Int
+    ) -> CGSize {
         if section == 0 {
             // Yalnızca ilk section için header boyutu
-            return CGSize(width: collectionView.frame.width, height: 260)
+            return CGSize(width: collectionView.frame.width, height: 50)
         } else {
             // Diğer section'larda header yok
             return .zero
         }
+    }
+}
+
+extension MovieDetailsProviderImpl {
+    func prepareCollectionView(data: [MovieDetailsVMImpl.SectionType]) {
+        dataList = data
+        print("📢 CollectionView Güncelleniyor, Veri Sayısı: \(data.count)")
+        reloadCollectionView()
     }
     
     func reloadCollectionView() {
@@ -222,25 +230,4 @@ extension MovieDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewDa
             self?.collectionView?.reloadData()
         }
     }
-    
-    func prepareCollectionView(data: [MovieDetails]) {
-        dataList = data
-        print("📢 CollectionView Güncelleniyor, Veri Sayısı: \(data.count)")
-        reloadCollectionView()
-    }
-    
-    // Yeni: Cast list güncelleme metodu
-    func updateCastList(cast: [Cast]) {
-        self.castList = cast
-        print("Cast list updated with \(cast.count) items")
-        reloadCollectionView()
-    }
-    
-    // Yeni: Trailer güncelleme metodu
-    func updateTrailer(video: [MovieVideo]) {
-        self.trailer = video
-        reloadCollectionView()
-    }
-    
-    
 }
