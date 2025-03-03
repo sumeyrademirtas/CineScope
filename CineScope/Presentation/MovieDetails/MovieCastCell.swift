@@ -24,7 +24,7 @@ class MovieCastCell: UICollectionViewCell {
     }()
     
     //Clousure to notify selection events
-    var onCastSelected: ((Cast) -> Void)?
+    var onCastSelected: ((Int) -> Void)?
 
 
     private let horizontalCollectionView: UICollectionView = {
@@ -96,14 +96,8 @@ extension MovieCastCell: UICollectionViewDelegate, UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selectedCast = castList[indexPath.row]
-        guard let castId = selectedCast.id else {
-                print("Cast ID is nil")
-                return
-            }
+        let selectedCast = castList[indexPath.item]
         print("Inner Cell Tıklandı: \(selectedCast.name ?? "Unknown") - ID: \(String(describing: selectedCast.id))")
-        onCastSelected?(selectedCast)
+        onCastSelected?(selectedCast.id!)
     }
-    
-    
 }
