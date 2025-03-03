@@ -8,8 +8,8 @@
 
 import UIKit
 
-class PersonMoviePosterViewCell: UICollectionViewCell {
-    static let reuseIdentifier = "PersonMoviePosterViewCell"
+class PersonMediaPosterViewCell: UICollectionViewCell {
+    static let reuseIdentifier = "PersonMediaPosterViewCell"
     
     private let posterImageView: UIImageView = {
         let imageView = UIImageView()
@@ -41,14 +41,15 @@ class PersonMoviePosterViewCell: UICollectionViewCell {
     }
     
     // PersonMovieCredits modeline uygun yapılandırma metodu
-    func configure(with credits: PersonMovieCredits) {
-        loadImage(from: credits.fullPosterURL)
+    func configure(with movieCredits: PersonMovieCredits) {
+        loadImage(from: movieCredits.fullPosterURL)
     }
     
-    func configure() {
-       
+    // PersonTvCredits modeline uygun yapılandırma metodu. fazladan ayni dosyadan bi daha yazmak yerine configure u overload edecegim.
+    func configure(with tvCredits: PersonTvCredits) {
+        loadImage(from: tvCredits.fullPosterURL)
+
     }
-    
     
     
     private func loadImage(from urlString: String) {
