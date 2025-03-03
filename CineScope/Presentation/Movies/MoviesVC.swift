@@ -34,8 +34,7 @@ class MoviesVC: BaseViewController {
         layout.minimumLineSpacing = 10
         layout.minimumInteritemSpacing = 10
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-//        collectionView.backgroundColor = .darkGray
-        collectionView.backgroundColor = UIColor(hue: 0.65, saturation: 0.27, brightness: 0.18, alpha: 1.00)
+        collectionView.backgroundColor = UIColor.brandDarkBlue
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
