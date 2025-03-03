@@ -35,9 +35,10 @@ class MovieDetailsVC: BaseViewController {
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
-//        layout.minimumLineSpacing = 10
         layout.headerReferenceSize = CGSize(width: UIScreen.main.bounds.width, height: 250) // Header boyutu
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .brandDarkBlue
+
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
@@ -66,11 +67,9 @@ class MovieDetailsVC: BaseViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-
-
-        view.backgroundColor = UIColor(hue: 0.65, saturation: 0.27, brightness: 0.18, alpha: 1.00) // Debug
+        view.backgroundColor = UIColor.brandDarkBlue
         collectionView.contentInsetAdjustmentBehavior = .never
+        //    Eğer Navigation Bar varsa, CollectionView başlangıçta aşağıya kayar (içeriğin üstü Navigation Bar’ın altından başlamaz).
 
 
         setupUI()
@@ -112,17 +111,10 @@ extension MovieDetailsVC {
             switch event {
             case .isLoading(let isShow):
                 self?.loading(isShow: isShow)
-            case .movieDetails(let details):
-                print("✅ Movie Details Alındı: \(details.title)")
-                self?.inputPR.send(.prepareCollectionView(data: [details]))
             case .errorOccurred(let message):
                 self?.showError(message: message)
-            case .movieCredits(let cast):
-                print("🎭 Oyuncular alındı! Cast Count: \(cast.count)")
-                self?.inputPR.send(.updateCast(cast: cast))
-            case .movieVideos(let videos):
-                print("🎬 Trailer Videos Alındı: \(videos.count)")
-                self?.inputPR.send(.updateTrailer(video: videos))
+            case .dataSource( let section):
+                self?.inputPR.send(.prepareCollectionView(data: section))
             }
         }.store(in: &cancellables)
 
