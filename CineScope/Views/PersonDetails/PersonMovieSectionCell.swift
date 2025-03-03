@@ -7,10 +7,11 @@
 
 import UIKit
 
-class PersonMoviesSectionCell: UICollectionViewCell {
-    static let reuseIdentifier = "PersonMoviesSectionCell"
+class PersonMovieSectionCell: UICollectionViewCell {
+    static let reuseIdentifier = "PersonMovieSectionCell"
 
     private var personMovies: [PersonMovieCredits] = []
+    
     
     var onMovieSelected: ((Int) -> Void)?
 
@@ -46,8 +47,8 @@ class PersonMoviesSectionCell: UICollectionViewCell {
         contentView.addSubview(innerCollectionView)
         innerCollectionView.dataSource = self
         innerCollectionView.delegate = self
-        innerCollectionView.register(PersonMoviePosterViewCell.self,
-                                     forCellWithReuseIdentifier: PersonMoviePosterViewCell.reuseIdentifier) // Poster cell
+        innerCollectionView.register(PersonMediaPosterViewCell.self,
+                                     forCellWithReuseIdentifier: PersonMediaPosterViewCell.reuseIdentifier) // Poster cell
 
         // Auto Layout
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -70,7 +71,7 @@ class PersonMoviesSectionCell: UICollectionViewCell {
 }
 
 // MARK: - DataSource, Delegate
-extension PersonMoviesSectionCell: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension PersonMovieSectionCell: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return personMovies.count
     }
@@ -78,9 +79,9 @@ extension PersonMoviesSectionCell: UICollectionViewDataSource, UICollectionViewD
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: "PersonMoviePosterViewCell",
-            for: indexPath) as? PersonMoviePosterViewCell else {
-            fatalError("Cannot dequeue PersonMoviePosterViewCell")
+            withReuseIdentifier: "PersonMediaPosterViewCell",
+            for: indexPath) as? PersonMediaPosterViewCell else {
+            fatalError("Cannot dequeue PersonMediaPosterViewCell")
         }
         let personMovie = personMovies[indexPath.item]
         cell.configure(with: personMovie) // Poster’ı yükleyen bir metot
