@@ -6,11 +6,16 @@
 ////
 //
 
-
 import UIKit
+import Lottie
 
 class MovieDetailsContentCell: UICollectionViewCell {
     static let reuseIdentifier = "MovieDetailsContentCell"
+    
+    var onFavoriteToggled: ((Bool) -> Void)?
+    private var isFavorite: Bool = false
+
+
 
     // MARK: - UI Elements
 
@@ -35,7 +40,7 @@ class MovieDetailsContentCell: UICollectionViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
+
     // More Button (Eğer 300+ kelime varsa gösterilecek)
     private let moreButton: UIButton = {
         let button = UIButton(type: .system)
@@ -47,7 +52,7 @@ class MovieDetailsContentCell: UICollectionViewCell {
         return button
     }()
 
-    //Genre
+    // Genre
     private let genreLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.italicSystemFont(ofSize: 14)
@@ -58,6 +63,7 @@ class MovieDetailsContentCell: UICollectionViewCell {
     }()
 
     // MARK: - Poster + Info Stack (yatay)
+
     private let horizontalStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
@@ -69,6 +75,7 @@ class MovieDetailsContentCell: UICollectionViewCell {
     }()
 
     // MARK: - Info (dikey)
+
     private let infoStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -80,12 +87,13 @@ class MovieDetailsContentCell: UICollectionViewCell {
     }()
 
     // MARK: - Rating Progress
+
     private let ratingProgressView: CircularProgressView = {
         let view = CircularProgressView(radius: 16) // ✅ Artık büyüklüğü değişiyor
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-    
+
     private let releaseDateLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 14)
@@ -94,7 +102,7 @@ class MovieDetailsContentCell: UICollectionViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
+
     private let runtimeLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 14)
@@ -103,8 +111,16 @@ class MovieDetailsContentCell: UICollectionViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
+    
+    private let favoriteAnimationView: FavoriteAnimationView = {
+        let view = FavoriteAnimationView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
 
     // MARK: - Rating, ReleaseDate, Runtime
+
     private let ratingDateRuntimeStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
@@ -116,6 +132,7 @@ class MovieDetailsContentCell: UICollectionViewCell {
     }()
 
     // MARK: - Tüm Layout'u Tutan Dikey Stack
+
     private let verticalStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -127,22 +144,33 @@ class MovieDetailsContentCell: UICollectionViewCell {
     }()
 
     // MARK: - Init
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
         moreButton.addTarget(self, action: #selector(moreButtonTapped), for: .touchUpInside)
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(favoriteTapped))
+        favoriteAnimationView.isUserInteractionEnabled = true
+        favoriteAnimationView.addGestureRecognizer(tapGesture)
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
     // MARK: - Setup UI
+
     private func setupUI() {
         contentView.backgroundColor = UIColor(hue: 0.65, saturation: 0.27, brightness: 0.18, alpha: 1.00) // Debug
         NSLayoutConstraint.activate([
             ratingProgressView.widthAnchor.constraint(equalToConstant: 40), // Genişlik
             ratingProgressView.heightAnchor.constraint(equalToConstant: 40) // Yükseklik
+        ])
+        NSLayoutConstraint.activate([
+            favoriteAnimationView.widthAnchor.constraint(equalToConstant: 40),
+            favoriteAnimationView.heightAnchor.constraint(equalToConstant: 40)
         ])
 
         // Info stack'e genre + overview ekle
@@ -158,6 +186,7 @@ class MovieDetailsContentCell: UICollectionViewCell {
         ratingDateRuntimeStackView.addArrangedSubview(ratingProgressView)
         ratingDateRuntimeStackView.addArrangedSubview(releaseDateLabel)
         ratingDateRuntimeStackView.addArrangedSubview(runtimeLabel)
+        ratingDateRuntimeStackView.addArrangedSubview(favoriteAnimationView)
 
         // Dikey stack'e sırasıyla horizontalStackView (poster + info), sonra ratingStackView ekle
         verticalStackView.addArrangedSubview(horizontalStackView)
@@ -174,41 +203,28 @@ class MovieDetailsContentCell: UICollectionViewCell {
         ])
     }
 
-    // MARK: - Configure
-//    func configure(with overview: String, genres: String, posterURL: String?, voteAverage: CGFloat, releaseDate: String, runtime: String) {
-//        overviewLabel.text = overview
-//        genreLabel.text = genres
-//        ratingProgressView.setProgress(voteAverage: voteAverage) // Oranı ayarla
-//        loadImage(from: posterURL)
-//        
-//        // Eğer 300+ varsa More butonunu göster
-//        if overview.count > 250 {
-//                    moreButton.isHidden = false
-//                } else {
-//                    moreButton.isHidden = true
-//                }
-//
-//        
-//        // SF Symbol ile Release Date Label
-//        let calendarIcon = NSTextAttachment()
-//        calendarIcon.image = UIImage(systemName: "calendar")?.withTintColor(.white, renderingMode: .alwaysOriginal)
-//        calendarIcon.bounds = CGRect(x: 0, y: -2, width: 14, height: 14)
-//
-//        let releaseAttributedString = NSMutableAttributedString(attachment: calendarIcon)
-//        releaseAttributedString.append(NSAttributedString(string: " \(releaseDate)"))
-//        releaseDateLabel.attributedText = releaseAttributedString
-//
-//        // SF Symbol ile Runtime Label
-//        let clockIcon = NSTextAttachment()
-//        clockIcon.image = UIImage(systemName: "clock")?.withTintColor(.white, renderingMode: .alwaysOriginal)
-//        clockIcon.bounds = CGRect(x: 0, y: -2, width: 14, height: 14)
-//
-//        let runtimeAttributedString = NSMutableAttributedString(attachment: clockIcon)
-//        runtimeAttributedString.append(NSAttributedString(string: " \(runtime)"))
-//        runtimeLabel.attributedText = runtimeAttributedString
-//    }
     
+}
 
+// MARK: - ToggleFavoriteAnimation, - FavoriteTapped
+extension MovieDetailsContentCell {
+    
+    func toggleFavoriteAnimation(isFavorite: Bool) {
+        favoriteAnimationView.toggleFavorite(to: isFavorite, completion: nil)
+    }
+    
+    @objc private func favoriteTapped() {
+        // Mevcut durumu toggle edelim
+        favoriteAnimationView.toggleFavorite(to: !favoriteAnimationView.isFavorite) { finished in
+            print("Favori animasyonu tamamlandı, state: \(self.favoriteAnimationView.isFavorite)")
+            // Bu durumu dışarıya bir delegate veya closure ile iletebilirsin.
+        }
+    }
+}
+
+// MARK: - Configure
+extension MovieDetailsContentCell {
+    
     func configure(with movie: MovieDetails) {
         overviewLabel.text = movie.overview
         genreLabel.text = movie.genres?.map { $0.name }.joined(separator: ", ") ?? "N/A"
@@ -216,23 +232,26 @@ class MovieDetailsContentCell: UICollectionViewCell {
         loadImage(from: movie.fullPosterURL)
         releaseDateLabel.attributedText = createAttributedText(iconName: "calendar", text: movie.releaseDate)
         runtimeLabel.attributedText = createAttributedText(iconName: "clock", text: movie.formattedRuntime)
-        
+
         // Eğer overview 250 karakterden uzunsa "More" butonunu göster
         moreButton.isHidden = movie.overview.count <= 250
     }
+}
 
-    // MARK: - Yardımcı Fonksiyon
+// MARK: - CreateAttributedText, LoadImage
+extension MovieDetailsContentCell {
+
     private func createAttributedText(iconName: String, text: String) -> NSAttributedString {
         let iconAttachment = NSTextAttachment()
         iconAttachment.image = UIImage(systemName: iconName)?.withTintColor(.white, renderingMode: .alwaysOriginal)
         iconAttachment.bounds = CGRect(x: 0, y: -2, width: 14, height: 14)
-        
+
         let attributedText = NSMutableAttributedString(attachment: iconAttachment)
         attributedText.append(NSAttributedString(string: " \(text)"))
         return attributedText
     }
 
-    // MARK: - Load Image
+
     private func loadImage(from urlString: String?) {
         guard let urlString = urlString, let url = URL(string: urlString) else {
             posterImageView.image = UIImage(named: "placeholder")
@@ -251,39 +270,44 @@ class MovieDetailsContentCell: UICollectionViewCell {
         }.resume()
     }
     
-    // MARK: - More Button Action
-       @objc private func moreButtonTapped() {
-           let moreDetailsVC = MoreDetailsVC(text: overviewLabel.text ?? "")
-           moreDetailsVC.modalPresentationStyle = .formSheet
-           if let sheet = moreDetailsVC.sheetPresentationController {
-               sheet.detents = [
-                           .custom(resolver: { context in
-                               return UIScreen.main.bounds.height / 3 // ✅ Ekran yüksekliğinin 1/3’ü
-                           })
-                       ]
-               sheet.preferredCornerRadius = 16
-               
-               // Yukarı çekme çubuğu görünmesin
-               sheet.prefersGrabberVisible = false
-               
-               // Sayfa yukarı kaydırılmasın
-               moreDetailsVC.isModalInPresentation = false
-           }
+}
 
-           if let parentVC = findViewController() {
-               parentVC.present(moreDetailsVC, animated: true)
-           }
-       }
+// MARK: - More Button Action
+extension MovieDetailsContentCell {
 
-       // MARK: - Find Parent ViewController
-       private func findViewController() -> UIViewController? {
-           var responder: UIResponder? = self
-           while let nextResponder = responder?.next {
-               if let viewController = nextResponder as? UIViewController {
-                   return viewController
-               }
-               responder = nextResponder
-           }
-           return nil
-       }
+    @objc private func moreButtonTapped() {
+        let moreDetailsVC = MoreDetailsVC(text: overviewLabel.text ?? "")
+        moreDetailsVC.modalPresentationStyle = .formSheet
+        if let sheet = moreDetailsVC.sheetPresentationController {
+            sheet.detents = [
+                .custom(resolver: { _ in
+                    UIScreen.main.bounds.height / 3
+                })
+            ]
+            sheet.preferredCornerRadius = 16
+
+            // Yukarı çekme çubuğu görünmesin
+            sheet.prefersGrabberVisible = false
+
+        }
+
+        if let parentVC = findViewController() {
+            parentVC.present(moreDetailsVC, animated: true)
+        }
+    }
+}
+
+// MARK: - Find Parent ViewController
+extension MovieDetailsContentCell {
+
+    private func findViewController() -> UIViewController? {
+        var responder: UIResponder? = self
+        while let nextResponder = responder?.next {
+            if let viewController = nextResponder as? UIViewController {
+                return viewController
+            }
+            responder = nextResponder
+        }
+        return nil
+    }
 }
