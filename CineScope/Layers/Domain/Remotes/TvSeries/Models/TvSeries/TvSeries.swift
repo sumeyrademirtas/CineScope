@@ -10,6 +10,8 @@ import Foundation
 // MARK: - Tv Series
 struct TvSeries: Decodable {
     let posterPath: String
+    let id: Int
+    let name: String
     
     var fullPosterURL: String {
         let baseUrl = "https://image.tmdb.org/t/p/w500"
@@ -18,6 +20,7 @@ struct TvSeries: Decodable {
     
     enum CodingKeys: String, CodingKey {
         case posterPath = "poster_path"
+        case id, name
     }
 }
 
