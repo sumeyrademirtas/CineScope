@@ -226,3 +226,23 @@ extension MovieDetailsProviderImpl {
         }
     }
 }
+
+extension MovieDetailsProviderImpl {
+    /// Verilen movieId'ye sahip .info section'daki cell'i bulur ve favori animasyonunu tetikler.
+    func animateFavorite(for movieId: Int, isFavorite: Bool) {
+        // DataList'te, .info section'ında movie bilgisi varsa ve movie.id eşleşiyorsa:
+        if let infoSectionIndex = dataList.firstIndex(where: { section in
+            if case .info(let rows) = section,
+               let firstRow = rows.first,
+               case .movieInfo(let movie) = firstRow {
+                return movie.id == movieId
+            }
+            return false
+        }) {
+            let indexPath = IndexPath(item: 0, section: infoSectionIndex)
+            if let cell = collectionView?.cellForItem(at: indexPath) as? MovieDetailsContentCell {
+                cell.toggleFavoriteAnimation(isFavorite: isFavorite)
+            }
+        }
+    }
+}
