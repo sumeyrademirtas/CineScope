@@ -205,7 +205,7 @@ extension MovieDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewDa
     ) -> CGSize {
         if section == 0 {
             // Yalnızca ilk section için header boyutu
-            return CGSize(width: collectionView.frame.width, height: 50)
+            return CGSize(width: collectionView.frame.width, height: 60)
         } else {
             // Diğer section'larda header yok
             return .zero
