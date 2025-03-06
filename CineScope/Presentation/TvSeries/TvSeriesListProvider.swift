@@ -31,7 +31,7 @@ final class TvSeriesListProviderImpl: NSObject, TvSeriesListProvider {
 extension TvSeriesListProviderImpl {
     
     enum TvSeriesListProviderOutput {
-        case didSelect(indexPath: IndexPath)
+        case didSelectTvSeries(tvSeries: Int)
     }
     
     enum TvSeriesListProviderInput {
@@ -157,24 +157,40 @@ extension TvSeriesListProviderImpl: UICollectionViewDelegate, UICollectionViewDa
             switch row {
             case .tvSeries(let tvSeries):
                 cell.setUpDataList(tvSeries: tvSeries)
+                cell.onTvSeriesSelected = { [weak self] selectedTvSeries in
+                    print("Delegated Selected TvSeries: \(selectedTvSeries.name), ID: \(selectedTvSeries.id)")
+                    self?.output.send(.didSelectTvSeries(tvSeries: selectedTvSeries.id))
+                }
             }
         case .onTheAir(rows: let rows):
             let row = rows[indexPath.row]
             switch row {
             case .tvSeries(let tvSeries):
                 cell.setUpDataList(tvSeries: tvSeries)
+                cell.onTvSeriesSelected = { [weak self] selectedTvSeries in
+                    print("Delegated Selected TvSeries: \(selectedTvSeries.name), ID: \(selectedTvSeries.id)")
+                    self?.output.send(.didSelectTvSeries(tvSeries: selectedTvSeries.id))
+                }
             }
         case .popular(rows: let rows):
             let row = rows[indexPath.row]
             switch row {
             case .tvSeries(let tvSeries):
                 cell.setUpDataList(tvSeries: tvSeries)
+                cell.onTvSeriesSelected = { [weak self] selectedTvSeries in
+                    print("Delegated Selected TvSeries: \(selectedTvSeries.name), ID: \(selectedTvSeries.id)")
+                    self?.output.send(.didSelectTvSeries(tvSeries: selectedTvSeries.id))
+                }
             }
         case .topRated(rows: let rows):
             let row = rows[indexPath.row]
             switch row {
             case .tvSeries(let tvSeries):
                 cell.setUpDataList(tvSeries: tvSeries)
+                cell.onTvSeriesSelected = { [weak self] selectedTvSeries in
+                    print("Delegated Selected TvSeries: \(selectedTvSeries.name), ID: \(selectedTvSeries.id)")
+                    self?.output.send(.didSelectTvSeries(tvSeries: selectedTvSeries.id))
+                }
             }
         }
         return cell
