@@ -40,7 +40,7 @@ extension PersonDetailsProviderImpl {
 
     enum PersonDetailsProviderOutput {
         case didSelectMovie(movieId: Int) // FIXME: -
-        case didSelectTvSeries(TvSeriesId: Int) // FIXME: -
+        case didSelectTvSeries(tvSeriesId: Int) // FIXME: -
     }
 }
 
@@ -126,6 +126,9 @@ extension PersonDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewD
             }
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PersonTvSectionCell.reuseIdentifier, for: indexPath) as! PersonTvSectionCell
             cell.configure(with: tvCredits)
+            cell.onTvSeriesSelected = { [weak self] tvSeriesId in
+                print("tvSeries with ID \(tvSeriesId) selected from person's credits.")
+                self?.output.send(.didSelectTvSeries(tvSeriesId: tvSeriesId)) }
             return cell
         }
     }
