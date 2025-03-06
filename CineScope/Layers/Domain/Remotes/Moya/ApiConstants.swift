@@ -7,20 +7,24 @@
 
 import Foundation
 
-// Bu constantslari Edit Scheme > Run > Arguments icinde sakliyorum.
-// ProcessInfo.processInfo.environment ile okuyorum.
-
 struct ApiConstants {
     let apiKey: String
     let apiHost: String
 
     init() {
-        guard let apiKey = ProcessInfo.processInfo.environment["API_KEY"] else {
-            fatalError("API_KEY not found in Environment Variables")
+        guard let path = Bundle.main.path(forResource: "config", ofType: "plist"),
+              let dictionary = NSDictionary(contentsOfFile: path) else {
+            fatalError("Config.plist not found")
         }
-        guard let apiHost = ProcessInfo.processInfo.environment["API_HOST"] else {
-            fatalError("API_HOST not found in Environment Variables")
+
+        guard let apiKey = dictionary["API_KEY"] as? String else {
+            fatalError("API_KEY not found in Config.plist")
         }
+
+        guard let apiHost = dictionary["API_HOST"] as? String else {
+            fatalError("API_HOST not found in Config.plist")
+        }
+
         self.apiKey = apiKey
         self.apiHost = apiHost
     }
