@@ -83,7 +83,7 @@ class TvSeriesDetailsContentCell: UICollectionViewCell {
         return view
     }()
     
-    private let releaseDateLabel: UILabel = {
+    private let firtAirYearLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 14)
         label.textColor = .white
@@ -92,7 +92,7 @@ class TvSeriesDetailsContentCell: UICollectionViewCell {
         return label
     }()
     
-    private let runtimeLabel: UILabel = {
+    private let numberofSeasonsLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 14)
         label.textColor = .white
@@ -101,7 +101,7 @@ class TvSeriesDetailsContentCell: UICollectionViewCell {
         return label
     }()
 
-    // MARK: - Rating, ReleaseDate, Runtime
+    // MARK: - Rating, firtAirYearLabel, numberofSeasonsLabel
     private let ratingDateRuntimeStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
@@ -153,8 +153,8 @@ class TvSeriesDetailsContentCell: UICollectionViewCell {
 
         // Rating stack'e ratingProgressView ekle (İleride başka elemanlar da ekleyebilirsin)
         ratingDateRuntimeStackView.addArrangedSubview(ratingProgressView)
-        ratingDateRuntimeStackView.addArrangedSubview(releaseDateLabel)
-        ratingDateRuntimeStackView.addArrangedSubview(runtimeLabel)
+        ratingDateRuntimeStackView.addArrangedSubview(firtAirYearLabel)
+        ratingDateRuntimeStackView.addArrangedSubview(numberofSeasonsLabel)
 
         // Dikey stack'e sırasıyla horizontalStackView (poster + info), sonra ratingStackView ekle
         verticalStackView.addArrangedSubview(horizontalStackView)
@@ -177,8 +177,17 @@ class TvSeriesDetailsContentCell: UICollectionViewCell {
         genreLabel.text = tvSeries.genres?.map { $0.name }.joined(separator: ", ") ?? "N/A"
         ratingProgressView.setProgress(voteAverage: CGFloat(tvSeries.voteAverage ?? 0.0))
         loadImage(from: tvSeries.fullPosterURL)
-//        releaseDateLabel.attributedText = createAttributedText(iconName: "calendar", text: tvSeries.releaseDate)
-//        runtimeLabel.attributedText = createAttributedText(iconName: "clock", text: tvSeries.formattedRuntime)
+        
+        let yearsRange = "\(tvSeries.firstAirYear) - \(tvSeries.lastAir)"
+        firtAirYearLabel.attributedText = createAttributedText(iconName: "calendar", text: yearsRange)
+        
+        let seasonsText: String
+        if let count = tvSeries.numberOfSeasons {
+            seasonsText = "\(count) Season" + (count > 1 ? "s" : "")
+        } else {
+            seasonsText = "N/A"
+        }
+        numberofSeasonsLabel.attributedText = createAttributedText(iconName: "tv", text: seasonsText)
         
         // Eğer overview 250 karakterden uzunsa "More" butonunu göster
         moreButton.isHidden = tvSeries.overview!.count <= 250 || tvSeries.overview!.isEmpty
