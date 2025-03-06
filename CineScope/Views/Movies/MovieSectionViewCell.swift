@@ -12,9 +12,7 @@ class MovieSectionViewCell: UICollectionViewCell {
     static let reuseIdentifier = "MovieSectionViewCell"
     
     var movies = [Movie]()
-//    func setUpDataList(movie: [Movie]) {
-//        self.movies = movie
-//    }
+
     
     private let innerCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
