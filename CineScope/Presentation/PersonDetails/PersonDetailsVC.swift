@@ -10,25 +10,25 @@ import Foundation
 import UIKit
 
 class PersonDetailsVC: BaseViewController {
-    
     deinit {
         print("Destroy PersonDetailsVC") // MARK: - Memory Leak Check
     }
+
     // MARK: - Types
 
     typealias P = PersonDetailsProvider
     typealias V = PersonDetailsVM
-    
+
     // MARK: - Properties
 
     private var viewModel: V?
     private var provider: (any P)?
-    
+
     // Combine binding
     private let inputVM = PassthroughSubject<PersonDetailsVMImpl.PersonDetailsVMInput, Never>()
     private let inputPR = PassthroughSubject<PersonDetailsProviderImpl.PersonDetailsProviderInput, Never>()
     private var cancellables = Set<AnyCancellable>()
-    
+
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -37,36 +37,36 @@ class PersonDetailsVC: BaseViewController {
         cv.translatesAutoresizingMaskIntoConstraints = false
         return cv
     }()
-    
+
     private var personId: Int?
-    
+
     init(viewModel: V, provider: any P /* , personId: Int */ ) {
         self.viewModel = viewModel
         self.provider = provider
         super.init(nibName: nil, bundle: nil)
     }
-    
+
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     // This method sets the person ID after initialization
     func configure(personId: Int) {
         self.personId = personId
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // Navigation bar'ı gizle
         navigationController?.setNavigationBarHidden(true, animated: animated)
-        
+
         // Ustteki kodu yazinca kaydirarak geri gitme ozelligi calismiyordu. onun da calismasi icin alttaki kodu ekledik
         navigationController?.interactivePopGestureRecognizer?.delegate = nil
     }
-    
+
     // MARK: - Lifecycle
-    
+
     override func viewDidLoad() {
         view.backgroundColor = .white
         super.viewDidLoad()
@@ -74,15 +74,13 @@ class PersonDetailsVC: BaseViewController {
         setupUI()
         binding()
         inputPR.send(.setupUI(collectionView: collectionView))
-            
+
         // Person ID ile fetch
         if let id = personId {
             inputVM.send(.fetchPersonDetails(personId: id))
             inputVM.send(.fetchPersonMovieCredits(personId: id))
             inputVM.send(.fetchPersonTvCredits(personId: id))
         }
-        
-        
     }
 }
 
@@ -116,7 +114,7 @@ extension PersonDetailsVC {
                 self?.showError(message: msg)
             }
         }).store(in: &cancellables)
-        
+
         // Provider Output
         let providerOutput = provider?.activityHandler(input: inputPR.eraseToAnyPublisher())
         providerOutput?.sink(receiveValue: { [weak self] event in
@@ -126,11 +124,11 @@ extension PersonDetailsVC {
                 self?.navigateToMovieDetails(movieId: movieId)
             case .didSelectTvSeries(let tvSeriesId):
                 print("📲 didSelectTvSeries triggered with tvSeriesId: \(tvSeriesId)")
+                self?.navigateToTvSeriesDetails(tvSeriesId: tvSeriesId)
             }
         }).store(in: &cancellables)
     }
 }
-
 
 // MARK: - Error Handling
 
@@ -145,10 +143,18 @@ extension PersonDetailsVC {
 
 extension PersonDetailsVC {
     private func navigateToMovieDetails(movieId: Int) {
-           let movieDetailsVC = MovieDetailsBuilderImpl().build(movieId: movieId)
-           movieDetailsVC.modalPresentationStyle = .pageSheet
-           movieDetailsVC.modalTransitionStyle = .crossDissolve
-           self.present(movieDetailsVC, animated: true, completion: nil)
-       }
+        let movieDetailsVC = MovieDetailsBuilderImpl().build(movieId: movieId)
+        movieDetailsVC.modalPresentationStyle = .pageSheet
+        movieDetailsVC.modalTransitionStyle = .crossDissolve
+        present(movieDetailsVC, animated: true, completion: nil)
+    }
 }
 
+extension PersonDetailsVC {
+    private func navigateToTvSeriesDetails(tvSeriesId: Int) {
+        let tvSeriesDetailsVC = TvSeriesDetailsBuilderImpl().build(tvSeriesId: tvSeriesId)
+        tvSeriesDetailsVC.modalPresentationStyle = .pageSheet
+        tvSeriesDetailsVC.modalTransitionStyle = .crossDissolve
+        present(tvSeriesDetailsVC, animated: true, completion: nil)
+    }
+}
