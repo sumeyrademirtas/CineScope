@@ -5,26 +5,26 @@
 //  Created by Sümeyra Demirtaş on 2/10/25.
 //
 
+import Combine
 import Foundation
 import UIKit
-import Combine
 
 class TvSeriesVC: BaseViewController {
-    
     // MARK: - Types
+
     typealias P = TvSeriesListProvider
     typealias V = TvSeriesVM
-    
+
     // MARK: - Properties
+
     private var viewModel: V?
     private var provider: (any P)?
-    
-    //Combine binding
+
+    // Combine binding
     private let inputVM = PassthroughSubject<TvSeriesVMImpl.TvSeriesVMInput, Never>()
     private let inputPR = PassthroughSubject<TvSeriesListProviderImpl.TvSeriesListProviderInput, Never>()
     private var cancellables = Set<AnyCancellable>()
-    
-    
+
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -36,24 +36,27 @@ class TvSeriesVC: BaseViewController {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
-    
+
     // MARK: - Init
-    init(viewModel: V, provider: (any P)) {
+
+    init(viewModel: V, provider: any P) {
         self.viewModel = viewModel
         self.provider = provider
         super.init(nibName: nil, bundle: nil)
     }
-    
-    required init?(coder: NSCoder) { //storyboard olmadigi icin
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) { // storyboard olmadigi icin
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     // MARK: - Lifecycle
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
 //        self.loading(isShow: true)
-        
+
         setupUI()
         binding()
         inputPR.send(.setupUI(collectionView: collectionView))
@@ -63,6 +66,7 @@ class TvSeriesVC: BaseViewController {
 }
 
 // MARK: - Setup UI
+
 extension TvSeriesVC {
     private func setupUI() {
         view.addSubview(collectionView)
@@ -76,6 +80,7 @@ extension TvSeriesVC {
 }
 
 // MARK: - Combine Binding
+
 extension TvSeriesVC {
     private func binding() {
         // vm den gelen ciktilari dinle
@@ -93,20 +98,18 @@ extension TvSeriesVC {
                 self?.inputPR.send(.prepareCollectionView(data: section))
             }
         }.store(in: &cancellables)
-        
+
         // providerdan gelen ciktilari dinle
         let providerOutput = provider?.activityHandler(input: inputPR.eraseToAnyPublisher())
         providerOutput?.sink {
             [weak self] event in
             switch event {
-            case .didSelect(let indexPath):
-                print("Seçilen IndexPath: \(indexPath)")
+            case .didSelectTvSeries(let tvSeriesId):
+                self?.navigateToTvSeriesDetails(tvSeriesId: tvSeriesId)
             }
         }.store(in: &cancellables)
     }
 }
-
-
 
 // MARK: - Error Handling
 
@@ -116,5 +119,20 @@ extension TvSeriesVC {
         let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
+    }
+}
+
+// ✅ **TvSeries Details Sayfasına Geçiş Yap**
+extension TvSeriesVC {
+    private func navigateToTvSeriesDetails(tvSeriesId: Int) {
+        let tvSeriesDetailsVC = TvSeriesDetailsBuilderImpl().build(tvSeriesId: tvSeriesId)
+        tvSeriesDetailsVC.modalPresentationStyle = .pageSheet
+        tvSeriesDetailsVC.modalTransitionStyle = .crossDissolve
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = scene.windows.first,
+           let rootVC = window.rootViewController
+        {
+            rootVC.present(tvSeriesDetailsVC, animated: true)
+        }
     }
 }
