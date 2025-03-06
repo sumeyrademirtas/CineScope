@@ -55,8 +55,8 @@ class TvSeriesCastCell: UICollectionViewCell {
         horizontalCollectionView.delegate = self
         horizontalCollectionView.dataSource = self
         horizontalCollectionView.register(
-            MovieCastPhotoCell.self,
-            forCellWithReuseIdentifier: MovieCastPhotoCell.reuseIdentifier
+            TvSeriesCastPhotoCell.self,
+            forCellWithReuseIdentifier: TvSeriesCastPhotoCell.reuseIdentifier
         )
 
         NSLayoutConstraint.activate([
