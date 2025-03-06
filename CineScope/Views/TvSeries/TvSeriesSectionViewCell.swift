@@ -15,6 +15,8 @@ class TvSeriesSectionViewCell: UICollectionViewCell {
     var tvSeries = [TvSeries]()
     func setUpDataList(tvSeries: [TvSeries]) {
         self.tvSeries = tvSeries
+        innerCollectionView.reloadData()
+
     }
     
     private let innerCollectionView: UICollectionView = {
@@ -27,6 +29,9 @@ class TvSeriesSectionViewCell: UICollectionViewCell {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
+    
+    // Closure to notify selection events
+    var onTvSeriesSelected: ((TvSeries) -> Void)?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -75,5 +80,11 @@ extension TvSeriesSectionViewCell: UICollectionViewDataSource, UICollectionViewD
         }
         cell.configure(with: tvSeries[indexPath.row])
         return cell
+    }
+    
+    // MARK: Mahsuna sor. Provider icinde yapamadigim icin burada yaptim problem olur mu?
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let selectedTvSeries = tvSeries[indexPath.row]
+        onTvSeriesSelected?(selectedTvSeries)
     }
 }
