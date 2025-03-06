@@ -67,10 +67,10 @@ class MovieCastCell: UICollectionViewCell {
             titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
             // Collection View konumu
-            horizontalCollectionView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
-            horizontalCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            horizontalCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            horizontalCollectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor/*, constant: -8*/)
+            horizontalCollectionView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
+            horizontalCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            horizontalCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            horizontalCollectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
         ])
     }
     func configure(with cast: [Cast]) {
