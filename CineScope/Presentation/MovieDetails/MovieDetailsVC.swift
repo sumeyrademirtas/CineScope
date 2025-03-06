@@ -10,11 +10,10 @@ import Foundation
 import UIKit
 
 class MovieDetailsVC: BaseViewController {
-    
     deinit {
         print("Destroy MovieDetailsVC") // MARK: - Memory Leak Check
     }
-    
+
     // MARK: - Types
 
     typealias P = MovieDetailsProvider
@@ -42,8 +41,6 @@ class MovieDetailsVC: BaseViewController {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
-    
-
 
     // MARK: - Init
 
@@ -71,7 +68,6 @@ class MovieDetailsVC: BaseViewController {
         collectionView.contentInsetAdjustmentBehavior = .never
         //    Eğer Navigation Bar varsa, CollectionView başlangıçta aşağıya kayar (içeriğin üstü Navigation Bar’ın altından başlamaz).
 
-
         setupUI()
         binding()
         inputPR.send(.setupUI(collectionView: collectionView))
@@ -81,9 +77,8 @@ class MovieDetailsVC: BaseViewController {
             inputVM.send(.fetchMovieCredits(movieId: movieId)) // Cast için de ekle
             inputVM.send(.fetchMovieVideos(movieId: movieId))
         }
-        
-        print("🛠️ CollectionView Delegate: \(String(describing: collectionView.delegate))")
 
+        print("🛠️ CollectionView Delegate: \(String(describing: collectionView.delegate))")
     }
 }
 
@@ -113,7 +108,7 @@ extension MovieDetailsVC {
                 self?.loading(isShow: isShow)
             case .errorOccurred(let message):
                 self?.showError(message: message)
-            case .dataSource( let section):
+            case .dataSource(let section):
                 self?.inputPR.send(.prepareCollectionView(data: section))
             }
         }.store(in: &cancellables)
@@ -123,7 +118,11 @@ extension MovieDetailsVC {
             [weak self] event in
             switch event {
             case .didToggleFavorite(let movieId, let isFavorite):
-                print("Favori Durumu Değişti: MovieID: \(movieId), Favori: \(isFavorite)")
+                    print("Favori Durumu Değişti: MovieID: \(movieId), Favori: \(isFavorite)")
+                    // Provider, dataList ve collectionView'ı yönettiği için animasyonu onun üzerinden tetikleyin:
+                if let providerImpl = self!.provider as? MovieDetailsProviderImpl {
+                        providerImpl.animateFavorite(for: movieId, isFavorite: isFavorite)
+                    }
             case .didSelectCast(let personId):
                 print("Did select cast with personId: \(personId)")
                 self?.navigateToCastDetails(personId: personId)
@@ -143,12 +142,12 @@ extension MovieDetailsVC {
 }
 
 
-
+// MARK: Navigate to Cast Details
 extension MovieDetailsVC {
     private func navigateToCastDetails(personId: Int) {
         let personDetailsVC = PersonDetailsBuilderImpl().build(personId: personId)
         personDetailsVC.modalPresentationStyle = .pageSheet
         personDetailsVC.modalTransitionStyle = .crossDissolve
-        self.present(personDetailsVC, animated: true, completion: nil)
+        present(personDetailsVC, animated: true, completion: nil)
     }
 }
