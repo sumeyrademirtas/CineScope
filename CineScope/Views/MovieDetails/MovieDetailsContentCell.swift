@@ -6,16 +6,19 @@
 ////
 //
 
-import UIKit
 import Lottie
+import UIKit
 
 class MovieDetailsContentCell: UICollectionViewCell {
     static let reuseIdentifier = "MovieDetailsContentCell"
-    
-    var onFavoriteToggled: ((Bool) -> Void)?
+
+    var onFavoriteToggled: ((Int, Bool, String, String) -> Void)?
+    // Properties to store movie details for favoriting
+    private var movieId: Int = 0
+    private var posterURL: String?
+    private var itemType: String?
+
     private var isFavorite: Bool = false
-
-
 
     // MARK: - UI Elements
 
@@ -111,13 +114,12 @@ class MovieDetailsContentCell: UICollectionViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
+
     private let favoriteAnimationView: FavoriteAnimationView = {
         let view = FavoriteAnimationView()
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-    
 
     // MARK: - Rating, ReleaseDate, Runtime
 
@@ -149,7 +151,7 @@ class MovieDetailsContentCell: UICollectionViewCell {
         super.init(frame: frame)
         setupUI()
         moreButton.addTarget(self, action: #selector(moreButtonTapped), for: .touchUpInside)
-        
+
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(favoriteTapped))
         favoriteAnimationView.isUserInteractionEnabled = true
         favoriteAnimationView.addGestureRecognizer(tapGesture)
@@ -202,30 +204,42 @@ class MovieDetailsContentCell: UICollectionViewCell {
             verticalStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16)
         ])
     }
-
-    
 }
 
 // MARK: - ToggleFavoriteAnimation, - FavoriteTapped
+
 extension MovieDetailsContentCell {
-    
     func toggleFavoriteAnimation(isFavorite: Bool) {
         favoriteAnimationView.toggleFavorite(to: isFavorite, completion: nil)
     }
-    
+
+//    @objc private func favoriteTapped() {
+//        // Mevcut durumu toggle edelim
+//        favoriteAnimationView.toggleFavorite(to: !favoriteAnimationView.isFavorite) { finished in
+//            print("Favori animasyonu tamamlandı, state: \(self.favoriteAnimationView.isFavorite)")
+//            // Bu durumu dışarıya bir delegate veya closure ile iletebilirsin.
+//        }
+//    }
     @objc private func favoriteTapped() {
-        // Mevcut durumu toggle edelim
-        favoriteAnimationView.toggleFavorite(to: !favoriteAnimationView.isFavorite) { finished in
-            print("Favori animasyonu tamamlandı, state: \(self.favoriteAnimationView.isFavorite)")
-            // Bu durumu dışarıya bir delegate veya closure ile iletebilirsin.
+        let newState = !favoriteAnimationView.isFavorite
+        favoriteAnimationView.toggleFavorite(to: newState) { _ in
+            print("Favorite animation completed, state: \(self.favoriteAnimationView.isFavorite)")
+            // Cell'de sakladığınız movieId, posterURL ve itemType bilgilerini closure aracılığıyla iletin.
+            self.onFavoriteToggled?(self.movieId, self.favoriteAnimationView.isFavorite, self.posterURL ?? "", self.itemType ?? "")
         }
     }
 }
 
 // MARK: - Configure
+
 extension MovieDetailsContentCell {
-    
     func configure(with movie: MovieDetails) {
+        // Save additional details for favorite toggling
+        movieId = movie.id
+        posterURL = movie.fullPosterURL
+        // Örneğin, burada itemType "movie" olarak ayarlanabilir; TV dizisi için "tv" değeri kullanılabilir.
+        itemType = "movie"
+
         overviewLabel.text = movie.overview
         genreLabel.text = movie.genres?.map { $0.name }.joined(separator: ", ") ?? "N/A"
         ratingProgressView.setProgress(voteAverage: CGFloat(movie.voteAverage))
@@ -235,12 +249,21 @@ extension MovieDetailsContentCell {
 
         // Eğer overview 250 karakterden uzunsa "More" butonunu göster
         moreButton.isHidden = movie.overview.count <= 250
+
+        // Favori durumunu kontrol et
+        let isFav = CoreDataManager.shared.isFavorite(id: Int64(movie.id))
+        if isFav != favoriteAnimationView.isFavorite {
+            // Favori durumunu, animasyon oynatmadan güncelleyin.
+            // Eğer mevcut durum false ise ve isFav true ise, state'i true yap.
+            // Tersine, durum false olacak.
+            favoriteAnimationView.toggleFavorite(to: isFav, completion: nil)
+        }
     }
 }
 
 // MARK: - CreateAttributedText, LoadImage
-extension MovieDetailsContentCell {
 
+extension MovieDetailsContentCell {
     private func createAttributedText(iconName: String, text: String) -> NSAttributedString {
         let iconAttachment = NSTextAttachment()
         iconAttachment.image = UIImage(systemName: iconName)?.withTintColor(.white, renderingMode: .alwaysOriginal)
@@ -250,7 +273,6 @@ extension MovieDetailsContentCell {
         attributedText.append(NSAttributedString(string: " \(text)"))
         return attributedText
     }
-
 
     private func loadImage(from urlString: String?) {
         guard let urlString = urlString, let url = URL(string: urlString) else {
@@ -269,12 +291,11 @@ extension MovieDetailsContentCell {
             }
         }.resume()
     }
-    
 }
 
 // MARK: - More Button Action
-extension MovieDetailsContentCell {
 
+extension MovieDetailsContentCell {
     @objc private func moreButtonTapped() {
         let moreDetailsVC = MoreDetailsVC(text: overviewLabel.text ?? "")
         moreDetailsVC.modalPresentationStyle = .formSheet
@@ -288,7 +309,6 @@ extension MovieDetailsContentCell {
 
             // Yukarı çekme çubuğu görünmesin
             sheet.prefersGrabberVisible = false
-
         }
 
         if let parentVC = findViewController() {
@@ -298,8 +318,8 @@ extension MovieDetailsContentCell {
 }
 
 // MARK: - Find Parent ViewController
-extension MovieDetailsContentCell {
 
+extension MovieDetailsContentCell {
     private func findViewController() -> UIViewController? {
         var responder: UIResponder? = self
         while let nextResponder = responder?.next {
