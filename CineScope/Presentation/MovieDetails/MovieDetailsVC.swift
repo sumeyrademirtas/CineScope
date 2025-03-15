@@ -114,18 +114,22 @@ extension MovieDetailsVC {
         }.store(in: &cancellables)
 
         let providerOutput = provider?.activityHandler(input: inputPR.eraseToAnyPublisher())
-        providerOutput?.sink {
-            [weak self] event in
+        providerOutput?.sink { [weak self] event in
+            guard let self = self else { return }
             switch event {
-            case .didToggleFavorite(let movieId, let isFavorite):
-                    print("Favori Durumu Değişti: MovieID: \(movieId), Favori: \(isFavorite)")
-                    // Provider, dataList ve collectionView'ı yönettiği için animasyonu onun üzerinden tetikleyin:
-                if let providerImpl = self!.provider as? MovieDetailsProviderImpl {
-                        providerImpl.animateFavorite(for: movieId, isFavorite: isFavorite)
-                    }
+            case .didToggleFavorite(let movieId, let isFavorite, let posterURL, let itemType):
+                print("Favori Durumu Değişti: MovieID: \(movieId), Favori: \(isFavorite), posterURL: \(posterURL), itemType: \(itemType)")
+                if isFavorite {
+                    CoreDataManager.shared.addFavorite(id: Int64(movieId), posterURL: posterURL, itemType: itemType)
+                } else {
+                    CoreDataManager.shared.removeFavorite(id: Int64(movieId))
+                }
+                if let providerImpl = self.provider as? MovieDetailsProviderImpl {
+                    providerImpl.animateFavorite(for: movieId, isFavorite: isFavorite)
+                }
             case .didSelectCast(let personId):
                 print("Did select cast with personId: \(personId)")
-                self?.navigateToCastDetails(personId: personId)
+                self.navigateToCastDetails(personId: personId)
             }
         }.store(in: &cancellables)
     }
