@@ -102,15 +102,6 @@ extension MoviesVC {
                 self?.navigateToMovieDetails(movieId: movieId)
             }
         }.store(in: &cancellables)
-//        let providerOutput = provider?.activityHandler(input: inputPR.eraseToAnyPublisher())
-//        providerOutput?.sink {
-//            [weak self] event in
-//            switch event {
-//            case .didSelectMovie(let movieId):
-//                print("📲 Navigasyon çağrıldı! MovieID: \(movieId)")
-//                self?.navigateToMovieDetails(movieId: movieId) // ✅ Navigasyon çağrısı
-//            }
-//        }.store(in: &cancellables)
     }
 }
 
