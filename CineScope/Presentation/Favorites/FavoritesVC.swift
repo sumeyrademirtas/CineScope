@@ -19,6 +19,11 @@ class FavoritesVC: UIViewController {
         loadFavorites()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        loadFavorites()
+    }
+    
     private func setupUI() {
         view.backgroundColor = .white
         title = "Favoriler"
