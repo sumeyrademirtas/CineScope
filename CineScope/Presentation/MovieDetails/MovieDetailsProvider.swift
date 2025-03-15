@@ -38,7 +38,8 @@ extension MovieDetailsProviderImpl {
     
     enum MovieDetailsProviderOutput {
         // FIXME: -
-        case didToggleFavorite(movieId: Int, isFavorite: Bool)
+//        case didToggleFavorite(movieId: Int, isFavorite: Bool)
+        case didToggleFavorite(movieId: Int, isFavorite: Bool, posterURL: String, itemType: String)
         case didSelectCast(castId: Int)
     }
 }
@@ -138,6 +139,11 @@ extension MovieDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewDa
             }
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieDetailsContentCell.reuseIdentifier, for: indexPath) as! MovieDetailsContentCell
             cell.configure(with: movie)
+            // Favori toggle olayını VC'ye iletmek için:
+            cell.onFavoriteToggled = { [weak self] movieId, isFavorite, posterURL, itemType in
+                // Burada provider output olarak event'i tetikleyebilirsiniz.
+                self?.output.send(.didToggleFavorite(movieId: movieId, isFavorite: isFavorite, posterURL: posterURL, itemType: itemType))
+            }
             return cell
         case .cast(let rows):
             guard let row = rows.first, case .movieCast(let cast) = row else {
@@ -148,7 +154,6 @@ extension MovieDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewDa
             cell.onCastSelected = { [weak self] castId in
                 print("Cast with ID \(castId) selected from movies cast.")
                 self?.output.send(.didSelectCast(castId: castId))
-
             }
             return cell
         }
@@ -182,7 +187,8 @@ extension MovieDetailsProviderImpl: UICollectionViewDelegate, UICollectionViewDa
                 case .info(let rows):
                     // 3) rows.first -> .movieInfo(let movie) mi?
                     if let firstRow = rows.first,
-                       case .movieInfo(let movie) = firstRow {
+                       case .movieInfo(let movie) = firstRow
+                    {
                         // 4) Başlığı header'a set et
                         header.configure(with: movie.title)
                     }
@@ -234,7 +240,8 @@ extension MovieDetailsProviderImpl {
         if let infoSectionIndex = dataList.firstIndex(where: { section in
             if case .info(let rows) = section,
                let firstRow = rows.first,
-               case .movieInfo(let movie) = firstRow {
+               case .movieInfo(let movie) = firstRow
+            {
                 return movie.id == movieId
             }
             return false
