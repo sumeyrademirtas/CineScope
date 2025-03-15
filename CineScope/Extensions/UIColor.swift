@@ -12,4 +12,5 @@ extension UIColor {
 
     // ana renk
     static let brandDarkBlue = UIColor(hue: 0.65, saturation: 0.27, brightness: 0.18, alpha: 1.00)
+    static let lighterBrandDarkBlue = UIColor(hue: 0.65, saturation: 0.27, brightness: 0.30, alpha: 1.00)
 }
