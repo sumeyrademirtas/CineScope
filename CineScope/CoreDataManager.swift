@@ -36,6 +36,7 @@ final class CoreDataManager {
         if context.hasChanges {
             do {
                 try context.save()
+                print("Context saved successfully.")
             } catch {
                 print("Error saving context: \(error.localizedDescription)")
             }
@@ -50,6 +51,7 @@ final class CoreDataManager {
         favoriteItem.id = id
         favoriteItem.posterURL = posterURL
         favoriteItem.itemType = itemType
+        print("Adding favorite: id=\(id), posterURL=\(posterURL), itemType=\(itemType)")
         saveContext()
     }
     
@@ -88,6 +90,7 @@ final class CoreDataManager {
         let request: NSFetchRequest<FavoriteItem> = FavoriteItem.fetchRequest()
         do {
             let favorites = try context.fetch(request)
+            print("Fetched favorites count: \(favorites.count)")
             return favorites
         } catch {
             print("Error fetching favorites: \(error.localizedDescription)")
