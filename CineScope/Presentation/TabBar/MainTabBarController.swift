@@ -13,7 +13,6 @@ class MainTabBarController: UITabBarController {
         
         tabBar.backgroundColor = .gray
         
-        
         // Movies tab için builder kullanarak MoviesVC oluşturuyoruz.
         let moviesBuilder = MovieBuilderImpl()
         let moviesVC = moviesBuilder.build()
@@ -40,7 +39,15 @@ class MainTabBarController: UITabBarController {
             tag: 2
         )
         
+        // Favorites tab: Favoriler ekranını oluşturuyoruz.
+        let favoritesVC = FavoritesVC() // Önceki adımlarda oluşturduğumuz FavoritesVC
+        favoritesVC.tabBarItem = UITabBarItem(
+            title: "Favorites",
+            image: UIImage(systemName: "heart.fill"),
+            tag: 3
+        )
+               
         // TabBarController'ın viewControllers'ını ayarlıyoruz.
-        viewControllers = [moviesVC, tvSeriesVC, searchVC]
+        viewControllers = [moviesVC, tvSeriesVC, searchVC, favoritesVC]
     }
 }
