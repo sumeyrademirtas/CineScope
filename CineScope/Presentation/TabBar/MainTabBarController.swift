@@ -39,13 +39,15 @@ class MainTabBarController: UITabBarController {
             tag: 2
         )
         
-        // Favorites tab: Favoriler ekranını oluşturuyoruz.
-        let favoritesVC = FavoritesVC() // Önceki adımlarda oluşturduğumuz FavoritesVC
+        // Favorites tab
+        let favoritesBuilder = FavoritesBuilderImpl()
+        let favoritesVC = favoritesBuilder.build()
         favoritesVC.tabBarItem = UITabBarItem(
             title: "Favorites",
             image: UIImage(systemName: "heart.fill"),
             tag: 3
         )
+
                
         // TabBarController'ın viewControllers'ını ayarlıyoruz.
         viewControllers = [moviesVC, tvSeriesVC, searchVC, favoritesVC]
