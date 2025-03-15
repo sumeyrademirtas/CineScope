@@ -35,8 +35,7 @@ class MoreDetailsVC: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-//        view.backgroundColor = UIColor(white: 0.1, alpha: 1.0) // Koyu arka plan
-        view.backgroundColor = UIColor(red:0.176, green:0.176, blue:0.176, alpha:1.000)
+        view.backgroundColor =  .lighterBrandDarkBlue
         setupUI()
     }
 
