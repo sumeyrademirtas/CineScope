@@ -20,20 +20,12 @@ class PersonDetailsInfoCell: UICollectionViewCell {
         return iv
     }()
     
-    private let birthdayLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 14)
-        label.textColor = .lightGray
-        // Buraya küçük bir takvim ikonu da ekleyebilirsiniz (ör. NSAttributedString).
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
     
     private let biographyLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 15)
         label.textColor = .white
-        label.numberOfLines = 8
+        label.numberOfLines = 10
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -48,7 +40,6 @@ class PersonDetailsInfoCell: UICollectionViewCell {
         return button
     }()
 
-    // Bu örnekte, sağ tarafı bir vertical stackView ile yönetebilirsiniz.
     private let rightStackView: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
@@ -69,29 +60,6 @@ class PersonDetailsInfoCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-//    private func setupUI() {
-//        contentView.backgroundColor = .brandDarkBlue
-//
-//        contentView.addSubview(posterImageView)
-//        contentView.addSubview(rightStackView)
-//
-//        rightStackView.addArrangedSubview(birthdayLabel)
-//        rightStackView.addArrangedSubview(biographyLabel)
-//
-//        NSLayoutConstraint.activate([
-//            // Poster pinned top & bottom
-//            posterImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-//            posterImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
-//            posterImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
-//            posterImageView.widthAnchor.constraint(equalToConstant: 150),
-//
-//            // Right stack pinned top & bottom
-//            rightStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-//            rightStackView.leadingAnchor.constraint(equalTo: posterImageView.trailingAnchor, constant: 12),
-//            rightStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
-//            rightStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
-//        ])
-//    }
     
     private func setupUI() {
         contentView.backgroundColor = .brandDarkBlue
@@ -99,7 +67,6 @@ class PersonDetailsInfoCell: UICollectionViewCell {
         contentView.addSubview(posterImageView)
         contentView.addSubview(rightStackView)
 
-        rightStackView.addArrangedSubview(birthdayLabel)
         rightStackView.addArrangedSubview(biographyLabel)
         rightStackView.addArrangedSubview(moreButton)
 
@@ -114,30 +81,22 @@ class PersonDetailsInfoCell: UICollectionViewCell {
             rightStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
             rightStackView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -8),
 
-            moreButton.heightAnchor.constraint(equalToConstant: 30) // 📌 Buton boyutu
+            moreButton.heightAnchor.constraint(equalToConstant: 30)
         ])
 
         moreButton.addTarget(self, action: #selector(moreButtonTapped), for: .touchUpInside)
     }
 
-    // MARK: - Configure
-//    func configure(with person: PersonDetails) {
-//        // Örnek: PersonDetails modelinde birthday, biography ve profilePath gibi alanlar olsun
-//        birthdayLabel.text = "Born: \(person.birthday ?? "N/A")"
-//        biographyLabel.text = person.biography ?? "No biography"
-//        loadImage(from: person.profilePhotoURL!) // FIXME: - bunu unwrap yap ya da baska bir sey.
-//    }
+
     
     func configure(with person: PersonDetails) {
         personName = person.name
         biographyText = person.biography ?? "No biography available"
 
-        birthdayLabel.text = "Born: \(person.birthday ?? "N/A")"
         biographyLabel.text = biographyText
         loadImage(from: person.profilePhotoURL ?? "")
 
-        // 📌 Eğer biography 8 satırdan fazlaysa "More" butonunu göster
-        if biographyLabel.text?.count ?? 0 > 250 { // Tahmini olarak uzunluğu kontrol ediyoruz
+        if biographyLabel.text?.count ?? 0 > 270 {
             moreButton.isHidden = false
         } else {
             moreButton.isHidden = true
@@ -151,16 +110,17 @@ class PersonDetailsInfoCell: UICollectionViewCell {
         
         if let sheet = moreDetailsVC.sheetPresentationController {
             sheet.detents = [
-                .medium(), .large()
+                .custom(resolver: { _ in
+                    UIScreen.main.bounds.height / 3
+                }), .large()
             ]
             sheet.preferredCornerRadius = 16
             
-            // Yukarı çekme çubuğu görünmesin
             sheet.prefersGrabberVisible = true
             
-            // Sayfa yukarı kaydırılmasın
             moreDetailsVC.isModalInPresentation = false
         }
+
         
         if let parentVC = findViewController() {
             parentVC.present(moreDetailsVC, animated: true)
