@@ -36,7 +36,9 @@ extension TvSeriesDetailsProviderImpl {
     }
 
     enum TvSeriesDetailsProviderOutput {
-        case didToggleFavorite(tvSeriesId: Int, isFavorite: Bool)
+//        case didToggleFavorite(tvSeriesId: Int, isFavorite: Bool)
+        case didToggleFavorite(tvSeriesId: Int, isFavorite: Bool, posterURL: String, itemType: String)
+
         case didSelectCast(castId: Int)
     }
 }
@@ -136,6 +138,11 @@ extension TvSeriesDetailsProviderImpl: UICollectionViewDelegate, UICollectionVie
             }
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TvSeriesDetailsContentCell.reuseIdentifier, for: indexPath) as! TvSeriesDetailsContentCell
             cell.configure(with: tvSeries)
+            // Favori toggle olayını VC'ye iletmek için:
+            cell.onFavoriteToggled = { [weak self] tvSeriesId, isFavorite, posterURL, itemType in
+                // Burada provider output olarak event'i tetikleyebilirsiniz.
+                self?.output.send(.didToggleFavorite(tvSeriesId: tvSeriesId, isFavorite: isFavorite, posterURL: posterURL, itemType: itemType))
+            }
             return cell
         case .cast(let rows):
             guard let row = rows.first, case .tvSeriesCast(let cast) = row else {
@@ -221,6 +228,28 @@ extension TvSeriesDetailsProviderImpl {
     func reloadCollectionView() {
         DispatchQueue.main.async { [weak self] in
             self?.collectionView?.reloadData()
+        }
+    }
+}
+
+// FIXME: burasi gerekli mi emin degilim kontrol et
+extension TvSeriesDetailsProviderImpl {
+    /// Verilen movieId'ye sahip .info section'daki cell'i bulur ve favori animasyonunu tetikler.
+    func animateFavorite(for tvSeriesId: Int, isFavorite: Bool) {
+        // DataList'te, .info section'ında movie bilgisi varsa ve movie.id eşleşiyorsa:
+        if let infoSectionIndex = dataList.firstIndex(where: { section in
+            if case .info(let rows) = section,
+               let firstRow = rows.first,
+               case .tvSeriesInfo(let tvSeries) = firstRow
+            {
+                return tvSeries.id == tvSeriesId
+            }
+            return false
+        }) {
+            let indexPath = IndexPath(item: 0, section: infoSectionIndex)
+            if let cell = collectionView?.cellForItem(at: indexPath) as? TvSeriesDetailsContentCell {
+                cell.toggleFavoriteAnimation(isFavorite: isFavorite)
+            }
         }
     }
 }
