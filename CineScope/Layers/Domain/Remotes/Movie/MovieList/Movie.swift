@@ -9,13 +9,17 @@ import Foundation
 
 // MARK: - Movie
 struct Movie: Decodable {
-    let posterPath: String  // su anlik isim sadece posterpath ile.
+    let posterPath: String?  // su anlik isim sadece posterpath ile.
     let id: Int
     let title: String
     
-    var fullPosterURL: String {
-        let baseURL = "https://image.tmdb.org/t/p/w500" // Resim için temel URL
-        return "\(baseURL)\(posterPath)"
+//    var fullPosterURL: String? {
+//        let baseURL = "https://image.tmdb.org/t/p/w500" // Resim için temel URL
+//        return "\(baseURL)\(posterPath)"
+//    }
+    var fullPosterURL: String? {
+        guard let posterPath = posterPath else { return nil }
+        return "https://image.tmdb.org/t/p/w500\(posterPath)"
     }
     
     enum CodingKeys: String, CodingKey {
