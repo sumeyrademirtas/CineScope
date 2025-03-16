@@ -213,13 +213,6 @@ extension MovieDetailsContentCell {
         favoriteAnimationView.toggleFavorite(to: isFavorite, completion: nil)
     }
 
-//    @objc private func favoriteTapped() {
-//        // Mevcut durumu toggle edelim
-//        favoriteAnimationView.toggleFavorite(to: !favoriteAnimationView.isFavorite) { finished in
-//            print("Favori animasyonu tamamlandı, state: \(self.favoriteAnimationView.isFavorite)")
-//            // Bu durumu dışarıya bir delegate veya closure ile iletebilirsin.
-//        }
-//    }
     @objc private func favoriteTapped() {
         let newState = !favoriteAnimationView.isFavorite
         favoriteAnimationView.toggleFavorite(to: newState) { _ in
