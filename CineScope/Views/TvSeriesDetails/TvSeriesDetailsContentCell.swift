@@ -5,9 +5,18 @@
 //  Created by Sümeyra Demirtaş on 3/4/25.
 //
 import UIKit
+import Lottie
 
 class TvSeriesDetailsContentCell: UICollectionViewCell {
     static let reuseIdentifier = "TvSeriesDetailsContentCell"
+    
+    var onFavoriteToggled: ((Int, Bool, String, String) -> Void)?
+    // Properties to store movie details for favoriting
+    private var tvSeriesId: Int = 0
+    private var posterURL: String?
+    private var itemType: String?
+
+    private var isFavorite: Bool = false
 
     // MARK: - UI Elements
 
@@ -100,6 +109,12 @@ class TvSeriesDetailsContentCell: UICollectionViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
+    
+    private let favoriteAnimationView: FavoriteAnimationView = {
+        let view = FavoriteAnimationView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
 
     // MARK: - Rating, firtAirYearLabel, numberofSeasonsLabel
     private let ratingDateRuntimeStackView: UIStackView = {
@@ -128,6 +143,9 @@ class TvSeriesDetailsContentCell: UICollectionViewCell {
         super.init(frame: frame)
         setupUI()
         moreButton.addTarget(self, action: #selector(moreButtonTapped), for: .touchUpInside)
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(favoriteTapped))
+        favoriteAnimationView.isUserInteractionEnabled = true
+        favoriteAnimationView.addGestureRecognizer(tapGesture)
     }
 
     required init?(coder: NSCoder) {
@@ -140,6 +158,10 @@ class TvSeriesDetailsContentCell: UICollectionViewCell {
         NSLayoutConstraint.activate([
             ratingProgressView.widthAnchor.constraint(equalToConstant: 40), // Genişlik
             ratingProgressView.heightAnchor.constraint(equalToConstant: 40) // Yükseklik
+        ])
+        NSLayoutConstraint.activate([
+            favoriteAnimationView.widthAnchor.constraint(equalToConstant: 40),
+            favoriteAnimationView.heightAnchor.constraint(equalToConstant: 40)
         ])
 
         // Info stack'e genre + overview ekle
@@ -155,6 +177,7 @@ class TvSeriesDetailsContentCell: UICollectionViewCell {
         ratingDateRuntimeStackView.addArrangedSubview(ratingProgressView)
         ratingDateRuntimeStackView.addArrangedSubview(firtAirYearLabel)
         ratingDateRuntimeStackView.addArrangedSubview(numberofSeasonsLabel)
+        ratingDateRuntimeStackView.addArrangedSubview(favoriteAnimationView)
 
         // Dikey stack'e sırasıyla horizontalStackView (poster + info), sonra ratingStackView ekle
         verticalStackView.addArrangedSubview(horizontalStackView)
@@ -173,6 +196,13 @@ class TvSeriesDetailsContentCell: UICollectionViewCell {
 
 
     func configure(with tvSeries: TvSeriesDetails) {
+        
+        // Save additional details for favorite toggling
+        tvSeriesId = tvSeries.id!
+        posterURL = tvSeries.fullPosterURL
+        // Örneğin, burada itemType "movie" olarak ayarlanabilir; TV dizisi için "tv" değeri kullanılabilir.
+        itemType = "tvSeries"
+        
         overviewLabel.text = tvSeries.overview
         genreLabel.text = tvSeries.genres?.map { $0.name }.joined(separator: ", ") ?? "N/A"
         ratingProgressView.setProgress(voteAverage: CGFloat(tvSeries.voteAverage ?? 0.0))
@@ -191,6 +221,15 @@ class TvSeriesDetailsContentCell: UICollectionViewCell {
         
         // Eğer overview 250 karakterden uzunsa "More" butonunu göster
         moreButton.isHidden = tvSeries.overview!.count <= 250 || tvSeries.overview!.isEmpty
+        
+        // Favori durumunu kontrol et
+        let isFav = CoreDataManager.shared.isFavorite(id: Int64(tvSeries.id!))
+        if isFav != favoriteAnimationView.isFavorite {
+            // Favori durumunu, animasyon oynatmadan güncelleyin.
+            // Eğer mevcut durum false ise ve isFav true ise, state'i true yap.
+            // Tersine, durum false olacak.
+            favoriteAnimationView.toggleFavorite(to: isFav, completion: nil)
+        }
     }
 
     // MARK: - Yardımcı Fonksiyon
@@ -258,4 +297,22 @@ class TvSeriesDetailsContentCell: UICollectionViewCell {
            }
            return nil
        }
+}
+
+
+// MARK: - ToggleFavoriteAnimation, - FavoriteTapped
+
+extension TvSeriesDetailsContentCell {
+    func toggleFavoriteAnimation(isFavorite: Bool) {
+        favoriteAnimationView.toggleFavorite(to: isFavorite, completion: nil)
+    }
+
+    @objc private func favoriteTapped() {
+        let newState = !favoriteAnimationView.isFavorite
+        favoriteAnimationView.toggleFavorite(to: newState) { _ in
+            print("Favorite animation completed, state: \(self.favoriteAnimationView.isFavorite)")
+            // Cell'de sakladığınız tvSeriesId, posterURL ve itemType bilgilerini closure aracılığıyla iletin.
+            self.onFavoriteToggled?(self.tvSeriesId, self.favoriteAnimationView.isFavorite, self.posterURL ?? "", self.itemType ?? "")
+        }
+    }
 }
