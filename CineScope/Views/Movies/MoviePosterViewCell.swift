@@ -44,34 +44,40 @@ class MoviePosterViewCell: UICollectionViewCell {
             ])
     }
     
-    override func prepareForReuse() { //bunu dene. scroll ettiginde sapitiyo mu bak
-        super.prepareForReuse()
-        posterImageView.image = nil
-    }
+    override func prepareForReuse() {
+          super.prepareForReuse()
+          posterImageView.image = nil // Eski resmi temizle
+      }
     
     
     // MARK: Configure Cell
-    func configure(with movie: Movie){
-        loadImage(from: movie.fullPosterURL)
-    }
-    
-    // URL'den resim yükleme metodu
-    private func loadImage(from url: String) {
-        guard let url = URL(string: url) else {
-            posterImageView.image = UIImage(named: "placeholder") // Varsayılan bir görsel kullan
+    func configure(with movie: Movie) {
+        guard let posterURL = movie.fullPosterURL else {
+            posterImageView.image = UIImage(named: "placeholder") // Eğer URL yoksa varsayılan resim
             return
         }
-        URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
-            guard let self = self, let data = data, error == nil else {
-                DispatchQueue.main.async {
-                    self?.posterImageView.image = UIImage(named: "placeholder") // Hata durumunda varsayılan görsel
-                }
+        loadImage(from: posterURL)
+    }
+    
+    
+    // MARK: - URL'den Resim Yükleme
+        private func loadImage(from url: String) {
+            guard let imageURL = URL(string: url) else {
+                posterImageView.image = UIImage(named: "placeholder") // Geçersiz URL için varsayılan görsel
                 return
             }
-            DispatchQueue.main.async {
-                self.posterImageView.image = UIImage(data: data)
-            }
-        }.resume()
-    }
+            
+            URLSession.shared.dataTask(with: imageURL) { [weak self] data, _, error in
+                guard let self = self, let data = data, error == nil, let image = UIImage(data: data) else {
+                    DispatchQueue.main.async {
+                        self?.posterImageView.image = UIImage(named: "placeholder") // Hata durumunda varsayılan görsel
+                    }
+                    return
+                }
+                DispatchQueue.main.async {
+                    self.posterImageView.image = image
+                }
+            }.resume()
+        }
     
 }
