@@ -9,13 +9,18 @@ import Foundation
 
 // MARK: - Tv Series
 struct TvSeries: Decodable {
-    let posterPath: String
+    let posterPath: String?
     let id: Int
     let name: String
     
-    var fullPosterURL: String {
-        let baseUrl = "https://image.tmdb.org/t/p/w500"
-        return "\(baseUrl)\(posterPath)"
+//    var fullPosterURL: String {
+//        let baseUrl = "https://image.tmdb.org/t/p/w500"
+//        return "\(baseUrl)\(posterPath)"
+//    }
+    
+    var fullPosterURL: String? {
+        guard let posterPath = posterPath else { return nil }
+        return "https://image.tmdb.org/t/p/w500\(posterPath)"
     }
     
     enum CodingKeys: String, CodingKey {
