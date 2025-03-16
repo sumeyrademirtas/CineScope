@@ -114,8 +114,16 @@ extension TvSeriesDetailsVC {
         providerOutput?.sink {
             [weak self] event in
             switch event {
-            case .didToggleFavorite(let tvSeriesId, let isFavorite):
-                print("Favori Durumu Değişti: MovieID: \(tvSeriesId), Favori: \(isFavorite)")
+            case .didToggleFavorite(let tvSeriesId, let isFavorite, let posterURL, let itemType):
+                print("Favori Durumu Değişti: TvSeriesId: \(tvSeriesId), Favori: \(isFavorite), posterURL: \(posterURL), itemType: \(itemType)")
+                if isFavorite {
+                    CoreDataManager.shared.addFavorite(id: Int64(tvSeriesId), posterURL: posterURL, itemType: itemType)
+                } else {
+                    CoreDataManager.shared.removeFavorite(id: Int64(tvSeriesId))
+                }
+                if let providerImpl = self!.provider as? TvSeriesDetailsProviderImpl {
+                    providerImpl.animateFavorite(for: tvSeriesId, isFavorite: isFavorite)
+                }
             case .didSelectCast(let personId):
                 print("Did select cast with personId: \(personId)")
                 self?.navigateToCastDetails(personId: personId)
