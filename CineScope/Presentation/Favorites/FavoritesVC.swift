@@ -244,18 +244,3 @@ extension FavoritesVC {
         }.store(in: &cancellables)
     }
 }
-
-
-
-/*
- # Removed the UISegmentedControl and replaced it with three custom buttons: All, Movies, and TV Series for a better user experience.
- # Implemented filtering logic:
- # All: Displays all favorite items.
- # Movies: Shows only favorite movies.
- # TV Series: Shows only favorite TV series.
- # Styled buttons to visually indicate selection:
- # Selected button: White background with dark text.
- # Unselected buttons: Dark background with white text.
- # Ensured that “All” is selected by default when the page loads.
- # Updated the filtering mechanism to ensure real-time updates when a user toggles between categories.
- */
