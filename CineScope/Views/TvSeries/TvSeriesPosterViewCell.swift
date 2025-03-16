@@ -51,8 +51,15 @@ class TvSeriesPosterViewCell: UICollectionViewCell {
     
     
     // MARK: Configure Cell
-    func configure(with tvSeries: TvSeries){
-        loadImage(from: tvSeries.fullPosterURL)
+//    func configure(with tvSeries: TvSeries){
+//        loadImage(from: tvSeries.fullPosterURL)
+//    }
+    func configure(with tvSeries: TvSeries) {
+        guard let posterURL = tvSeries.fullPosterURL else {
+            posterImageView.image = UIImage(named: "placeholder") // Eğer URL yoksa varsayılan resim
+            return
+        }
+        loadImage(from: posterURL)
     }
     
     // URL'den resim yükleme metodu
