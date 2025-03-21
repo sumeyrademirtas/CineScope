@@ -15,15 +15,15 @@ protocol SearchBuilder {
 
 struct SearchBuilderImpl: SearchBuilder {
     func build() -> UIViewController {
-        
         let constants = ApiConstants()
-        let service = SearchMovieServiceImpl()
-        let useCase = SearchUseCaseImpl(service: service)
+        let movieService = SearchMovieServiceImpl()
+        let tvSeriesService = SearchTvSeriesServiceImpl()
+        let useCase = SearchUseCaseImpl(movieService: movieService, tvSeriesService: tvSeriesService)
         let viewModel = SearchVMImpl(useCase: useCase)
         let provider = SearchListProviderImpl()
-        let vc = SearchVC(viewModel: viewModel, provider: provider)
-        
-        
-        return vc
+        let searchVC = SearchVC(viewModel: viewModel, provider: provider)
+
+        let navController = UINavigationController(rootViewController: searchVC)
+        return navController
     }
 }
