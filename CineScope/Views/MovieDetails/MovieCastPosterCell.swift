@@ -45,8 +45,7 @@ class MovieCastPhotoCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
-//        contentView.backgroundColor = .red // Debug
-        contentView.backgroundColor = UIColor(hue: 0.65, saturation: 0.27, brightness: 0.18, alpha: 1.00) // Debug
+        contentView.backgroundColor = UIColor.brandDarkBlue
 
     }
 
@@ -60,18 +59,15 @@ class MovieCastPhotoCell: UICollectionViewCell {
         contentView.addSubview(characterLabel)
 
         NSLayoutConstraint.activate([
-            // Profile image at the top and centered
-            profileImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            profileImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
             profileImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             profileImageView.widthAnchor.constraint(equalToConstant: 120),
             profileImageView.heightAnchor.constraint(equalToConstant: 120),
 
-            // Name label below the image
             nameLabel.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 4),
             nameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 4),
             nameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -4),
             
-            // Character label below the name label
             characterLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 4),
             characterLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 4),
             characterLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -4),
@@ -89,8 +85,9 @@ class MovieCastPhotoCell: UICollectionViewCell {
     private func loadImage(from urlString: String) {
         guard !urlString.isEmpty, let url = URL(string: urlString) else {
             DispatchQueue.main.async {
-                self.profileImageView.image = UIImage(named: "placeholder")
-                self.profileImageView.backgroundColor = .darkGray
+                self.profileImageView.image = UIImage(systemName: "person.crop.circle")
+                self.profileImageView.tintColor = .lightGray
+                self.profileImageView.backgroundColor = .clear
             }
             return
         }
@@ -98,15 +95,15 @@ class MovieCastPhotoCell: UICollectionViewCell {
         URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
             guard let self = self, let data = data, error == nil else {
                 DispatchQueue.main.async {
-                    self?.profileImageView.image = UIImage(named: "placeholder")
-                    self?.profileImageView.backgroundColor = .darkGray
+                    self?.profileImageView.image = UIImage(systemName: "person.crop.circle")
+                    self?.profileImageView.tintColor = .lightGray
+                    self?.profileImageView.backgroundColor = .clear
                 }
                 return
             }
             DispatchQueue.main.async {
                 self.profileImageView.image = UIImage(data: data)
                 self.profileImageView.backgroundColor = .clear
-                // Force an update to the corner radius using the current bounds
                 self.profileImageView.layer.cornerRadius = self.profileImageView.bounds.width / 2
                 self.layoutIfNeeded()
             }
