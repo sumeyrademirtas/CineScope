@@ -12,6 +12,7 @@ import Foundation
 struct SearchTvSeries: Decodable {
     let posterPath: String?
     let name: String
+    let id: Int
     
     var fullPosterURL: String? {
         guard let posterPath = posterPath, !posterPath.isEmpty else { return nil }
@@ -22,10 +23,11 @@ struct SearchTvSeries: Decodable {
     enum CodingKeys: String, CodingKey {
         case posterPath = "poster_path"
         case name
+        case id
     }
 }
 
-// MARK: SearchMovieResponse
+// MARK: SearchTvSeriesResponse
 struct SearchTvSeriesResponse: Decodable {
     let results: [SearchTvSeries]
 }
