@@ -9,17 +9,22 @@ import Combine
 import Foundation
 import UIKit
 
-protocol SearchListProvider: TableViewProvider where T == SearchMovie, I == IndexPath {
+enum SearchItem {
+    case movie(SearchMovie)
+    case tvSeries(SearchTvSeries)
+}
+
+protocol SearchListProvider: TableViewProvider where T == SearchItem, I == IndexPath {
     func activityHandler(input: AnyPublisher<SearchListProviderImpl.SearchListProviderInput, Never>) -> AnyPublisher<SearchListProviderImpl.SearchListProviderOutput, Never>
 }
 
 final class SearchListProviderImpl: NSObject, SearchListProvider // Delegate DataSource protokollerini kullanacagimiz zaman NSObject gerekiyor o yuzden kullaniyoruz
 {
-    typealias T = SearchMovie
+    typealias T = SearchItem
     typealias I = IndexPath
     
-    var dataList: [SearchMovie] = []
-    
+    var dataList: [SearchItem] = []
+
     // Binding properties
     private let output = PassthroughSubject<SearchListProviderOutput, Never>()
     private var cancellables = Set<AnyCancellable>()
@@ -37,7 +42,7 @@ extension SearchListProviderImpl {
     
     enum SearchListProviderInput {
         case setupUI(tableView: UITableView)
-        case prepareTableView(data: [SearchMovie])
+        case prepareTableView(data: [SearchItem])
     }
 }
 
@@ -71,19 +76,19 @@ extension SearchListProviderImpl: UITableViewDelegate, UITableViewDataSource {
     
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 1 // Tek bir section kullanıyoruz.
+        return 1
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return dataList.count
-    }
+        }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: SearchResultTableViewCell.reuseIdentifier, for: indexPath) as? SearchResultTableViewCell else {
             fatalError("Unable to dequeue SearchResultTableViewCell")
         }
-        let movie = dataList[indexPath.row]
-        cell.configure(with: movie)
+        let item = dataList[indexPath.row]
+        cell.configure(with: item)
         return cell
     }
     
@@ -98,7 +103,7 @@ extension SearchListProviderImpl: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
-    func prepareTableView(data: [SearchMovie]) {
+    func prepareTableView(data: [SearchItem]) {
         self.dataList = data
         reloadTableView()
     }
