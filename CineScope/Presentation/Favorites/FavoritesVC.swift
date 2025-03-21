@@ -5,13 +5,12 @@
 //  Created by Sümeyra Demirtaş on 3/13/25.
 //
 
-
-import UIKit
 import Combine
+import UIKit
 
 class FavoritesVC: BaseViewController {
-    
     // MARK: - Properties
+
     private let viewModel: FavoritesVM
     private let provider: any FavoritesProvider
     private var cancellables = Set<AnyCancellable>()
@@ -19,13 +18,13 @@ class FavoritesVC: BaseViewController {
     private let inputVM = PassthroughSubject<FavoritesVMImpl.FavoritesVMInput, Never>()
     private let inputPR = PassthroughSubject<FavoritesProviderImpl.Input, Never>()
     
-    private var allFavorites: [FavoriteItem] = [] // Tüm favorileri saklayacağız
-    private var filteredFavorites: [FavoriteItem] = [] // Filtrelenmiş favoriler
+    private var allFavorites: [FavoriteItem] = []
+    private var filteredFavorites: [FavoriteItem] = []
 
-    private var selectedFilter: String? = nil // İlk açılışta filtre yok
-    
+    private var selectedFilter: String? = nil
     
     // MARK: - UI Elements
+
     private let allButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("All", for: .normal)
@@ -74,6 +73,7 @@ class FavoritesVC: BaseViewController {
     }()
     
     // MARK: - Init
+
     init(viewModel: FavoritesVM, provider: any FavoritesProvider) {
         self.viewModel = viewModel
         self.provider = provider
@@ -86,6 +86,7 @@ class FavoritesVC: BaseViewController {
     }
     
     // MARK: - Lifecycle
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -95,21 +96,19 @@ class FavoritesVC: BaseViewController {
         inputPR.send(.setupUI(collectionView: collectionView))
         
         inputVM.send(.fetchFavorites)
-        
+        collectionView.delegate = self
         allButton.addTarget(self, action: #selector(filterAll), for: .touchUpInside)
         moviesButton.addTarget(self, action: #selector(filterMovies), for: .touchUpInside)
         tvSeriesButton.addTarget(self, action: #selector(filterTvSeries), for: .touchUpInside)
-          
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         inputVM.send(.fetchFavorites)
-
     }
     
-    
     // MARK: - Setup UI
+
     private func setupUI() {
         view.backgroundColor = UIColor.brandDarkBlue
         title = "Favorites"
@@ -119,43 +118,38 @@ class FavoritesVC: BaseViewController {
         tvSeriesButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 100).isActive = true
         
         let buttonStackView = UIStackView(arrangedSubviews: [allButton, moviesButton, tvSeriesButton])
-               buttonStackView.axis = .horizontal
-               buttonStackView.spacing = 12
-               buttonStackView.distribution = .fillEqually
-               buttonStackView.translatesAutoresizingMaskIntoConstraints = false
+        buttonStackView.axis = .horizontal
+        buttonStackView.spacing = 12
+        buttonStackView.distribution = .fillEqually
+        buttonStackView.translatesAutoresizingMaskIntoConstraints = false
                
-               view.addSubview(buttonStackView)
+        view.addSubview(buttonStackView)
         view.addSubview(collectionView)
 
         NSLayoutConstraint.activate([
             buttonStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
-                  buttonStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16), // ✅ Sola dayalı yap
-                  buttonStackView.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -16), // Sağdan fazla boşluk bırakmaması için
+            buttonStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            buttonStackView.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -16),
                   
-                    
-                    collectionView.topAnchor.constraint(equalTo: buttonStackView.bottomAnchor, constant: 16),
-                    collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-                    collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-                    collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-                ])
-        
-        
+            collectionView.topAnchor.constraint(equalTo: buttonStackView.bottomAnchor, constant: 16),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
     }
     
     // MARK: - Filter Functions
+
     @objc private func filterAll() {
-        // "All" seçili ise filtreyi kaldır
         selectedFilter = nil
         updateButtonStyles()
         applyFilter()
     }
 
     @objc private func filterMovies() {
-        // Eğer "movie" zaten seçiliyse, filtreyi kaldır
         if selectedFilter == "movie" {
             selectedFilter = nil
         } else {
-            // Aksi halde, sadece "movie" seç
             selectedFilter = "movie"
         }
         updateButtonStyles()
@@ -172,28 +166,26 @@ class FavoritesVC: BaseViewController {
         applyFilter()
     }
         
-        private func applyFilter() {
-            if let filter = selectedFilter {
-                filteredFavorites = allFavorites.filter { $0.itemType == filter }
-            } else {
-                filteredFavorites = allFavorites
-            }
-            
-            inputPR.send(.reloadData(favorites: filteredFavorites))
+    private func applyFilter() {
+        if let filter = selectedFilter {
+            filteredFavorites = allFavorites.filter { $0.itemType == filter }
+        } else {
+            filteredFavorites = allFavorites
         }
-    
+            
+        inputPR.send(.reloadData(favorites: filteredFavorites))
+    }
     
     // MARK: - Button Style Update
+
     private func updateButtonStyles() {
-        
         if selectedFilter == nil {
-                // All buton seçili
-                allButton.backgroundColor = UIColor.white
-                allButton.setTitleColor(UIColor.brandDarkBlue, for: .normal)
-            } else {
-                allButton.backgroundColor = UIColor.brandDarkBlue
-                allButton.setTitleColor(UIColor.white, for: .normal)
-            }
+            allButton.backgroundColor = UIColor.white
+            allButton.setTitleColor(UIColor.brandDarkBlue, for: .normal)
+        } else {
+            allButton.backgroundColor = UIColor.brandDarkBlue
+            allButton.setTitleColor(UIColor.white, for: .normal)
+        }
         
         if selectedFilter == "movie" {
             moviesButton.backgroundColor = UIColor.white
@@ -211,11 +203,10 @@ class FavoritesVC: BaseViewController {
             tvSeriesButton.setTitleColor(UIColor.white, for: .normal)
         }
     }
-
 }
 
-
 // MARK: - ViewModel & Provider Binding
+
 extension FavoritesVC {
     private func binding() {
         let vmOutput = viewModel.activityHandler(input: inputVM.eraseToAnyPublisher())
@@ -227,20 +218,64 @@ extension FavoritesVC {
                 print("⏳ Favoriler yükleniyor: \(isShow)")
             case .dataSource(let favorites):
                 print("📢 Favori verileri Provider'a gönderiliyor: \(favorites.count) adet")
-                self.allFavorites = favorites // Tüm favorileri kaydet
-                self.applyFilter() // Filtreleme uygula
+                self.allFavorites = favorites
+                self.applyFilter()
             case .errorOccurred(let message):
                 print("❌ Favoriler HATA: \(message)")
             }
         }.store(in: &cancellables)
         
         let providerOutput = provider.activityHandler(input: inputPR.eraseToAnyPublisher())
-        providerOutput.receive(on: DispatchQueue.main).sink { event in
+        providerOutput.receive(on: DispatchQueue.main).sink { [weak self] event in
+            guard let self = self else { return }
             switch event {
-            case .didSelectFavoriteItem(let favoriteItem):
-                print("🎯 Seçilen favori: ID: \(favoriteItem.id)")
-                // Detay sayfası yönlendirmesi yapılabilir.
+            case .didSelectFavoriteItem(let indexPath):
+                print("Tiklandi")
             }
         }.store(in: &cancellables)
+    }
+}
+
+extension FavoritesVC: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard indexPath.item < filteredFavorites.count else { return }
+        let favorite = filteredFavorites[indexPath.item]
+        
+        guard let type = favorite.itemType?.lowercased() else { return }
+        if type == "movie" {
+            let movieDetailsVC = MovieDetailsBuilderImpl().build(movieId: Int(favorite.id))
+            movieDetailsVC.modalPresentationStyle = .pageSheet
+            movieDetailsVC.modalTransitionStyle = .crossDissolve
+            
+            if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = scene.windows.first,
+               let rootVC = window.rootViewController
+            {
+                rootVC.present(movieDetailsVC, animated: true)
+            }
+        } else if type == "tv" || type == "tvseries" {
+            let tvDetailsVC = TvSeriesDetailsBuilderImpl().build(tvSeriesId: Int(favorite.id))
+            tvDetailsVC.modalPresentationStyle = .pageSheet
+            tvDetailsVC.modalTransitionStyle = .crossDissolve
+            
+            if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = scene.windows.first,
+               let rootVC = window.rootViewController
+            {
+                rootVC.present(tvDetailsVC, animated: true)
+            }
+        }
+    }
+}
+
+extension FavoritesVC: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize
+    {
+        let totalSpacing: CGFloat = 16 * 3
+        let width = (collectionView.bounds.width - totalSpacing) / 3
+        let height = width * 1.5
+        return CGSize(width: width, height: height)
     }
 }
