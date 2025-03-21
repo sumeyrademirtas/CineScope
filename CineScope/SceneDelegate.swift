@@ -15,21 +15,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         
         guard let windowScene = (scene as? UIWindowScene) else { return }
-//
-//        let builder = MovieBuilderImpl()
-//        let viewController = builder.build()
-//
-//        let window = UIWindow(windowScene: windowScene)
-//        window.rootViewController = viewController
+        window = UIWindow(windowScene: windowScene)
+        window?.rootViewController = SplashViewController()
+        window?.makeKeyAndVisible()
         
-        // MainTabBarController'ı oluşturun
-        let tabBarController = MainTabBarController()
         
-        let window = UIWindow(windowScene: windowScene)
-        window.rootViewController = tabBarController
-        
-        self.window = window
-        window.makeKeyAndVisible()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
