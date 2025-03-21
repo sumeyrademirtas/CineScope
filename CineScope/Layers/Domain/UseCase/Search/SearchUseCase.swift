@@ -11,46 +11,42 @@ import Foundation
 // MARK: - Protocol Definition
 
 protocol SearchUseCase {
-    func fetchAllSearchResults(query: String) -> AnyPublisher<SearchMovieResponse?, Error>? // FIXME: Ilerleyen zamanlarda Tv icin de response ekleyebilirim aslinda buraya.
+    func fetchAllSearchResults(query: String) -> AnyPublisher<(SearchMovieResponse?, SearchTvSeriesResponse?), Error>?
 }
 
 struct SearchUseCaseImpl: SearchUseCase {
-    private let service: SearchMovieService
+    private let movieService: SearchMovieService
+    private let tvSeriesService: SearchTvSeriesService
 
-    init(service: SearchMovieService) {
-        self.service = service
+    init(movieService: SearchMovieService, tvSeriesService: SearchTvSeriesService) {
+        self.movieService = movieService
+        self.tvSeriesService = tvSeriesService
     }
 
-    func fetchAllSearchResults(query: String) -> AnyPublisher<SearchMovieResponse?, Error>? {
-        // Service'den arama sonuçlarını döndüren publisher'ı alıyoruz.
-        guard let moviePublisher = getSearchMovieResults(api: .getSearchMovieResults(page: 1, query: query)) else {
-            return nil
+    func fetchAllSearchResults(query: String) -> AnyPublisher<(SearchMovieResponse?, SearchTvSeriesResponse?), Error>? {
+        guard let moviePublisher = getSearchMovieResults(api: .getSearchMovieResults(page: 1, query: query)),
+              let tvSeriesPublisher = getSearchTvSeriesResults(api: .getSearchTvSeriesResults(page: 1, query: query))
+        else { return nil }
+        
+        // tvSeriesPublisher'dan hata alınırsa, nil döndüren bir publisher oluşturuyoruz.
+        let safeTvSeriesPublisher = tvSeriesPublisher.catch { _ in
+            Just(nil).setFailureType(to: Error.self)
         }
-        // Publisher'ı doğrudan, tipini soyutlayarak döndürüyoruz.
-        return moviePublisher.eraseToAnyPublisher()
+        
+        return Publishers.Zip(moviePublisher, safeTvSeriesPublisher)
+            .map { movieResponse, tvSeriesResponse in
+                return (movieResponse, tvSeriesResponse)
+            }
+            .eraseToAnyPublisher()
     }
-
 }
 
 extension SearchUseCaseImpl {
     func getSearchMovieResults(api: SearchMovieApi) -> AnyPublisher<SearchMovieResponse?, any Error>? {
-        service.getSearchMovieResults(api: api)
+        movieService.getSearchMovieResults(api: api)
+    }
+    
+    func getSearchTvSeriesResults(api: SearchTvSeriesApi) -> AnyPublisher<SearchTvSeriesResponse?, any Error>? {
+        tvSeriesService.getSearchTvSeriesResults(api: api)
     }
 }
-
-
-
-
-
-// FIXME: alttaki simdilik boyle dursun. Tv Service ekleyecegimiz zaman ziplicez.
-//    func fetchAllSearchResults() -> AnyPublisher<(SearchMovieResponse?), Error>? {
-//        if
-//            let moviePublisher = getSearchMovieResults(api: .getSearchMovieResults(page: 1))
-//        {
-//            return Publishers.Zip4(moviePublisher)
-//                .map { movie in (movie)
-//                }
-//                .eraseToAnyPublisher()
-//        }
-//        return nil
-//    }
