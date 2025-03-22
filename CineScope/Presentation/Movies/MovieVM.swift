@@ -47,6 +47,7 @@ extension MovieVMImpl {
     }
     
     enum SectionType { // Kategoriler
+        case trending(rows: [RowType])
         case popular(rows: [RowType])
         case upcoming(rows: [RowType])
         case nowPlaying(rows: [RowType])
@@ -60,13 +61,19 @@ extension MovieVMImpl {
 
 // MARK: - Prepare UI
 extension MovieVMImpl { 
-    private func updateUI(popular: MovieResponse?, upcoming: MovieResponse?, nowPlaying: MovieResponse?, topRated: MovieResponse?) -> [SectionType] {
+    private func updateUI(trending: MovieResponse?, popular: MovieResponse?, upcoming: MovieResponse?, nowPlaying: MovieResponse?, topRated: MovieResponse?) -> [SectionType] {
         
         var sections = [SectionType]()
+        var trendingRowType = [RowType]()
         var popularRowType = [RowType]()
         var upcomingRowType = [RowType]()
         var nowPlayingRowType = [RowType]()
         var topRatedRowType = [RowType]()
+        
+        if let trending = trending?.results {
+            trendingRowType.append(.movie(movie: trending))
+            sections.append(.trending(rows: trendingRowType))
+        }
         
         if let popular = popular?.results {
             popularRowType.append(.movie(movie: popular))
@@ -98,7 +105,7 @@ extension MovieVMImpl {
     private func fetchAllMovies(categories: [MovieCategory], page: Int) {
         self.output.send(.isLoading(isShow: true))
         self.useCase?.fetchAllMovies()?
-            .sink(receiveCompletion: { [weak self] completion in // (ViewModel) zayıf referans olarak tutulur
+            .sink(receiveCompletion: { [weak self] completion in // (ViewModel) zayıf referans
             guard let self else { return }
             switch completion {
             case . finished:
@@ -108,7 +115,7 @@ extension MovieVMImpl {
             }
         }, receiveValue: { [weak self] movies in
             guard let self else { return }
-            let sections = self.updateUI(popular: movies.0, upcoming: movies.1, nowPlaying: movies.2, topRated: movies.3)
+            let sections = self.updateUI(trending: movies.0, popular: movies.1, upcoming: movies.2, nowPlaying: movies.3, topRated: movies.4)
             self.output.send(.dataSource(section: sections))
         }).store(in: &cancellables)
     }
