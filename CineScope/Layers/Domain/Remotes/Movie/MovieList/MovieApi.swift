@@ -9,24 +9,26 @@ import Foundation
 import Moya
 
 enum MovieApi {
+    case getTrendingMovies(page: Int)
     case getPopularMovies(page: Int)
     case getTopRatedMovies(page: Int)
     case getNowPlayingMovies(page: Int)
     case getUpcomingMovies(page: Int)
 }
 
-extension MovieApi: TargetType { //TargetType Moya Provider in protokolu. Bu protocol baseURL, path, method, task. headers i getiriyor.
-    
+extension MovieApi: TargetType { // TargetType Moya Provider in protokolu. Bu protocol baseURL, path, method, task. headers i getiriyor.
     private var constants: ApiConstants {
         return ApiConstants()
     }
     
     var baseURL: URL {
-        return URL(string: constants.apiHost)! // TMDB API Base URL
+        return URL(string: constants.apiHost)!
     }
     
     var path: String {
         switch self {
+        case .getTrendingMovies:
+            return "/trending/movie/week"
         case .getPopularMovies:
             return "/movie/popular"
         case .getTopRatedMovies:
@@ -39,15 +41,16 @@ extension MovieApi: TargetType { //TargetType Moya Provider in protokolu. Bu pro
     }
     
     var method: Moya.Method {
-        return .get // Benim kullandigim TMDB Apiler GET istegi kullaniyor.
+        return .get
     }
     
     var task: Moya.Task {
         switch self {
-            case .getPopularMovies(page: let page),
-                .getNowPlayingMovies(page: let page),
-                .getTopRatedMovies(page: let page),
-                .getUpcomingMovies(page: let page):
+        case .getTrendingMovies(page: let page),
+             .getPopularMovies(page: let page),
+             .getNowPlayingMovies(page: let page),
+             .getTopRatedMovies(page: let page),
+             .getUpcomingMovies(page: let page):
             var params: [String: Any] = [:]
             params["api_key"] = constants.apiKey
             params["page"] = page
@@ -56,11 +59,9 @@ extension MovieApi: TargetType { //TargetType Moya Provider in protokolu. Bu pro
         }
     }
     
-    var headers: [String : String]? {
+    var headers: [String: String]? {
         return [
             "Content-Type": "application/json"
         ]
     }
-    
-    
 }
