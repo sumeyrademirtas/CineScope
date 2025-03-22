@@ -8,54 +8,52 @@
 import Foundation
 
 // MARK: - Movie
+
 struct Movie: Decodable {
-    let posterPath: String?  // su anlik isim sadece posterpath ile.
+    let posterPath: String?
     let id: Int
     let title: String
-    
-//    var fullPosterURL: String? {
-//        let baseURL = "https://image.tmdb.org/t/p/w500" // Resim için temel URL
-//        return "\(baseURL)\(posterPath)"
-//    }
+
     var fullPosterURL: String? {
         guard let posterPath = posterPath else { return nil }
         return "https://image.tmdb.org/t/p/w500\(posterPath)"
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case posterPath = "poster_path"
         case id, title
     }
 }
 
-
 // MARK: - MoviesResponse
+
 struct MovieResponse: Decodable {
     let results: [Movie]
 }
 
-
-enum MovieCategory: String {    // MARK: - Mahsuna sor. iyi dedi
+enum MovieCategory: String {
     case nowPlaying = "now_playing"
     case topRated = "top_rated"
-    case popular = "popular"
-    case upcoming = "upcoming"
-    
+    case popular
+    case upcoming
+    case trending
+
     static var orderedCategories: [MovieCategory] {
-        return [.popular, .upcoming, .nowPlaying, .topRated]
+        return [.trending, .popular, .upcoming, .nowPlaying, .topRated]
     }
-    
-    
-    var displayName: String { // Burayi header title icin yaptim.
-            switch self {
-            case .nowPlaying:
-                return "Now Playing"
-            case .popular:
-                return "Popular Movies"
-            case .topRated:
-                return "Top Rated"
-            case .upcoming:
-                return "Upcoming"
-            }
+
+    var displayName: String { // header title
+        switch self {
+        case .nowPlaying:
+            return "Now Playing"
+        case .popular:
+            return "Popular Movies"
+        case .topRated:
+            return "Top Rated"
+        case .upcoming:
+            return "Upcoming"
+        case .trending:
+            return ""
         }
+    }
 }
