@@ -10,6 +10,7 @@ import Foundation
 import Moya
 
 protocol MovieService {
+    func getTrendingMovies(api: MovieApi) -> AnyPublisher<MovieResponse?, Error>?
     func getPopularMovies(api: MovieApi) -> AnyPublisher<MovieResponse?, Error>?
     func getUpcomingMovies(api: MovieApi) -> AnyPublisher<MovieResponse?, Error>?
     func getNowPlayingMovies(api: MovieApi) -> AnyPublisher<MovieResponse?, Error>?
@@ -30,6 +31,33 @@ struct MovieServiceImpl: MovieService {
 }
 
 extension MovieServiceImpl {
+    
+    func getTrendingMovies(api: MovieApi) -> AnyPublisher<MovieResponse?, any Error>? {
+        return Future { promise in
+            provider.request(api) { result in // Burada MovieApi enum inin path ozelligine gore istek yapiyor.
+                switch result {
+                case .success(let response):
+                    do {
+                        // JSON verisini decode et ve unwrap yap
+                        let decodedResponse = try JSONDecoder().decode(MovieResponse.self, from: response.data)
+                        promise(.success(decodedResponse)) // Başarıyla promise gönder
+                    } catch {
+                        promise(.failure(error)) // JSON decode hatası
+                    }
+                case .failure(let moyaError):
+                    switch moyaError {
+                    case .underlying(let error, _):
+                        promise(.failure(error)) // Ağ hatası
+                    default:
+                        promise(.failure(moyaError)) // Diğer Moya hataları
+                    }
+                }
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    
     func getPopularMovies(api: MovieApi) -> AnyPublisher<MovieResponse?, any Error>? {
         return Future { promise in
             provider.request(api) { result in // Burada MovieApi enum inin path ozelligine gore istek yapiyor.
