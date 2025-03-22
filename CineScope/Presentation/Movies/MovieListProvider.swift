@@ -30,7 +30,6 @@ final class MovieListProviderImpl: NSObject, MovieListProvider {
 
 extension MovieListProviderImpl {
     enum MovieListProviderOutput {
-//        case didSelect(indexPath: IndexPath)
         case didSelectMovie(movieId: Int)
     }
     
@@ -64,10 +63,12 @@ extension MovieListProviderImpl: UICollectionViewDelegate, UICollectionViewDataS
         self.collectionView?.delegate = self
         self.collectionView?.dataSource = self
         self.collectionView?.register(MovieSectionViewCell.self, forCellWithReuseIdentifier: MovieSectionViewCell.reuseIdentifier)
-        // header icin
+        self.collectionView?.register(FeaturedSectionViewCell.self, forCellWithReuseIdentifier: FeaturedSectionViewCell.reuseIdentifier)
+        
+        // header
         self.collectionView?.register(UICollectionReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "DefaultHeaderView")
         
-        print("✅ CollectionView setup tamamlandı!") // Debug için
+        print("✅ CollectionView setup tamamlandı!")
     }
     
     /// Header View - Section Title Settings
@@ -108,14 +109,14 @@ extension MovieListProviderImpl: UICollectionViewDelegate, UICollectionViewDataS
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 1 // Her Section bir adet MovieSectionCell icerecek
     }
-    
-    /// Hücre boyutları
+
     func collectionView(
         _ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,
         sizeForItemAt indexPath: IndexPath
     ) -> CGSize {
-        return CGSize(width: collectionView.frame.width, height: 200) // Tüm genişlik + uygun yükseklik SECTION IN YUKSEKLIGI GENISLIGI BURASI.
+        let height: CGFloat = indexPath.section == 0 ? 400 : 200
+        return CGSize(width: collectionView.frame.width, height: height)
     }
     
     /// Section kenar boşlukları
@@ -144,50 +145,16 @@ extension MovieListProviderImpl: UICollectionViewDelegate, UICollectionViewDataS
     ) -> CGFloat {
         return 0 // Hücreler arası boşluk.
     }
-    
-    // Hucreyi olusturup yapilandiriyoruz
-//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-//        guard let cell =
-//                collectionView.dequeueReusableCell(withReuseIdentifier: MovieSectionViewCell.reuseIdentifier, for: indexPath) as? MovieSectionViewCell else {
-//            fatalError("Unable to dequeue MovieSectionViewCell")
-//        }
-//        let section = dataList[indexPath.section]
-//        switch section {
-//        case .popular(rows: let rows):
-//            let row = rows[indexPath.row]
-//            switch row {
-//            case .movie(let movie):
-//                cell.setUpDataList(movie: movie)
-//            }
-//        case .upcoming(rows: let rows):
-//            let row = rows[indexPath.row]
-//            switch row {
-//            case .movie(let movie):
-//                cell.setUpDataList(movie: movie)
-//            }
-//        case .nowPlaying(rows: let rows):
-//            let row = rows[indexPath.row]
-//            switch row {
-//            case .movie(let movie):
-//                cell.setUpDataList(movie: movie)
-//            }
-//        case .topRated(rows: let rows):
-//            let row = rows[indexPath.row]
-//            switch row {
-//            case .movie(let movie):
-//                cell.setUpDataList(movie: movie)
-//            }
-//        }
-//        return cell
-//    }
-    
+
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieSectionViewCell.reuseIdentifier, for: indexPath) as? MovieSectionViewCell else {
-            fatalError("Unable to dequeue MovieSectionViewCell")
-        }
         let section = dataList[indexPath.section]
+        
         switch section {
-        case .popular(let rows):
+        case .trending(let rows):
+            // Featured section için FeaturedSectionViewCell kullanılıyor
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeaturedSectionViewCell.reuseIdentifier, for: indexPath) as? FeaturedSectionViewCell else {
+                fatalError("Unable to dequeue FeaturedSectionViewCell")
+            }
             let row = rows[indexPath.row]
             switch row {
             case .movie(let movies):
@@ -197,7 +164,16 @@ extension MovieListProviderImpl: UICollectionViewDelegate, UICollectionViewDataS
                     self?.output.send(.didSelectMovie(movieId: selectedMovie.id))
                 }
             }
-        case .upcoming(rows: let rows):
+            return cell
+            
+        case .popular(let rows),
+             .upcoming(let rows),
+             .nowPlaying(let rows),
+             .topRated(let rows):
+            // Diğer sectionlar için MovieSectionViewCell kullanılıyor
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieSectionViewCell.reuseIdentifier, for: indexPath) as? MovieSectionViewCell else {
+                fatalError("Unable to dequeue MovieSectionViewCell")
+            }
             let row = rows[indexPath.row]
             switch row {
             case .movie(let movies):
@@ -207,54 +183,14 @@ extension MovieListProviderImpl: UICollectionViewDelegate, UICollectionViewDataS
                     self?.output.send(.didSelectMovie(movieId: selectedMovie.id))
                 }
             }
-        case .nowPlaying(rows: let rows):
-            let row = rows[indexPath.row]
-            switch row {
-            case .movie(let movies):
-                cell.setUpDataList(movie: movies)
-                cell.onMovieSelected = { [weak self] selectedMovie in
-                    print("Delegated Selected Movie: \(selectedMovie.title), ID: \(selectedMovie.id)")
-                    self?.output.send(.didSelectMovie(movieId: selectedMovie.id))
-                }
-            }
-        case .topRated(rows: let rows):
-            let row = rows[indexPath.row]
-            switch row {
-            case .movie(let movies):
-                cell.setUpDataList(movie: movies)
-                cell.onMovieSelected = { [weak self] selectedMovie in
-                    print("Delegated Selected Movie: \(selectedMovie.title), ID: \(selectedMovie.id)")
-                    self?.output.send(.didSelectMovie(movieId: selectedMovie.id))
-                }
-            }
+            return cell
         }
-        return cell
     }
-    
-//    // ✅ **Cell'e Tıklama Event'i**
-//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        print("🎯 Tıklanan index: \(indexPath.row)") // Hangi satır tıklandı, kontrol edelim
-//
-//        let sectionType = dataList[indexPath.section] // Önce SectionType'ı alıyoruz
-//
-//        switch sectionType {
-//        case .popular(let rows), .upcoming(let rows), .nowPlaying(let rows), .topRated(let rows):
-//            // Seçili index'e karşılık gelen RowType'ı al
-//            let rowType = rows[indexPath.row]
-//
-//            switch rowType {
-//            case .movie(let movies):
-//                guard let selectedMovie = movies.first else { return } // İlk filmi al
-//                print("🎬 Seçilen Film: \(selectedMovie.title), ID: \(selectedMovie.id)")
-//                navigateToMovieDetails(movie: selectedMovie) // Detay sayfasına yönlendir
-//            }
-//        }
-//    }
-    
+
     private func navigateToMovieDetails(movie: Movie) {
         let movieDetailsVC = MovieDetailsBuilderImpl().build(movieId: movie.id)
-        movieDetailsVC.modalPresentationStyle = .fullScreen // Modal tam ekran açılsın
-        movieDetailsVC.modalTransitionStyle = .crossDissolve // Geçiş efekti (isteğe bağlı)
+        movieDetailsVC.modalPresentationStyle = .fullScreen
+        movieDetailsVC.modalTransitionStyle = .crossDissolve
         
         if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let window = scene.windows.first,
