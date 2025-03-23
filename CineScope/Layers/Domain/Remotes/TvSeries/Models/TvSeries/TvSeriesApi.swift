@@ -9,6 +9,7 @@ import Foundation
 import Moya
 
 enum TvSeriesApi {
+    case getTrendingTvSeries(page: Int)
     case getAiringTodayTvSeries(page: Int)
     case getOnTheAirTvSeries(page: Int)
     case getPopularTvSeries(page: Int)
@@ -16,7 +17,6 @@ enum TvSeriesApi {
 }
 
 extension TvSeriesApi: TargetType {
-    
     private var constants: ApiConstants {
         return ApiConstants()
     }
@@ -27,6 +27,8 @@ extension TvSeriesApi: TargetType {
     
     var path: String {
         switch self {
+        case .getTrendingTvSeries(page: let page):
+            return "trending/tv/week"
         case .getAiringTodayTvSeries(page: let page):
             return "/tv/airing_today"
         case .getOnTheAirTvSeries(page: let page):
@@ -44,7 +46,9 @@ extension TvSeriesApi: TargetType {
     
     var task: Moya.Task {
         switch self {
-        case .getAiringTodayTvSeries(page: let page),
+        case
+            .getTrendingTvSeries(page: let page),
+            .getAiringTodayTvSeries(page: let page),
             .getOnTheAirTvSeries(page: let page),
             .getPopularTvSeries(page: let page),
             .getTopRatedTvSeries(page: let page):
@@ -56,10 +60,9 @@ extension TvSeriesApi: TargetType {
         }
     }
     
-    var headers: [String : String]? {
+    var headers: [String: String]? {
         return [
             "Content-Type": "application/json"
         ]
     }
-    
 }
