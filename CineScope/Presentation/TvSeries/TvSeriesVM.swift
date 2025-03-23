@@ -5,24 +5,24 @@
 //  Created by Sümeyra Demirtaş on 2/10/25.
 //
 
-import Foundation
 import Combine
+import Foundation
 
 // MARK: - Protocol Definition
+
 protocol TvSeriesVM {
     func activityHandler(input: AnyPublisher<TvSeriesVMImpl.TvSeriesVMInput, Never>) -> AnyPublisher<TvSeriesVMImpl.TvSeriesVMOutput, Never>
 }
 
 final class TvSeriesVMImpl: TvSeriesVM {
-    
     // Combine properties
     private let output = PassthroughSubject<TvSeriesVMOutput, Never>()
     private var cancellables = Set<AnyCancellable>()
     
-    //Usecase
+    // Usecase
     private var useCase: TvSeriesUseCase?
     
-    //DataStorage
+    // DataStorage
     private var categorySections: [TvSeriesCategory: [SectionType]] = [:]
     private var sections: [SectionType] = []
     private var tvSeries: [TvSeries] = []
@@ -34,8 +34,8 @@ final class TvSeriesVMImpl: TvSeriesVM {
 }
 
 // MARK: - Events
+
 extension TvSeriesVMImpl {
-    
     enum TvSeriesVMOutput {
         case isLoading(isShow: Bool)
         case errorOccured(message: String)
@@ -47,6 +47,7 @@ extension TvSeriesVMImpl {
     }
 
     enum SectionType {
+        case trending(rows: [RowType])
         case airingToday(rows: [RowType])
         case onTheAir(rows: [RowType])
         case popular(rows: [RowType])
@@ -59,14 +60,20 @@ extension TvSeriesVMImpl {
 }
 
 // MARK: - Prepare UI
+
 extension TvSeriesVMImpl {
-    private func updateUI(airingToday: TvSeriesResponse?, onTheAir: TvSeriesResponse?, popular: TvSeriesResponse?, topRated: TvSeriesResponse?) -> [SectionType] {
-        
+    private func updateUI(trending: TvSeriesResponse?, airingToday: TvSeriesResponse?, onTheAir: TvSeriesResponse?, popular: TvSeriesResponse?, topRated: TvSeriesResponse?) -> [SectionType] {
         var sections = [SectionType]()
+        var trendingRowType = [RowType]()
         var airingTodayRowType = [RowType]()
         var onTheAirRowType = [RowType]()
         var popularRowType = [RowType]()
         var topRatedRowType = [RowType]()
+        
+        if let trending = trending?.results {
+            trendingRowType.append(.tvSeries(tvSeries: trending))
+            sections.append(.trending(rows: trendingRowType))
+        }
         
         if let airingToday = airingToday?.results {
             airingTodayRowType.append(.tvSeries(tvSeries: airingToday))
@@ -90,16 +97,14 @@ extension TvSeriesVMImpl {
         
         return sections
     }
-    
 }
 
-
 // MARK: - Services - start
+
 extension TvSeriesVMImpl {
-    private func fetchAllTvSeries(categories: [TvSeriesCategory], page: Int)
-    {
-        self.output.send(.isLoading(isShow: true))
-        self.useCase?.fetchAllTvSeries()?
+    private func fetchAllTvSeries(categories: [TvSeriesCategory], page: Int) {
+        output.send(.isLoading(isShow: true))
+        useCase?.fetchAllTvSeries()?
             .sink(receiveCompletion: { [weak self] completion in
                 guard let self else { return }
                 switch completion {
@@ -109,18 +114,17 @@ extension TvSeriesVMImpl {
                     print("Error: \(error)")
                 }
             }, receiveValue: { [weak self] tvSeries in
-                //API'den gelen tvSeries tuple'ı burada alınır.
+                // API'den gelen tvSeries tuple'ı burada alınır.
                 guard let self else { return }
-                let sections = self.updateUI(airingToday: tvSeries.0, onTheAir: tvSeries.1, popular: tvSeries.2, topRated: tvSeries.3)
+                let sections = self.updateUI(trending: tvSeries.0, airingToday: tvSeries.1, onTheAir: tvSeries.2, popular: tvSeries.3, topRated: tvSeries.4)
                 // Dönüştürülen section verileri, output üzerinden dataSource event'i ile yayınlanır.
                 self.output.send(.dataSource(section: sections))
             }).store(in: &cancellables)
     }
 }
 
+// MARK: - ActivityHandler
 
-
-// MARK: -ActivityHandler
 extension TvSeriesVMImpl {
     func activityHandler(input: AnyPublisher<TvSeriesVMInput, Never>) -> AnyPublisher<TvSeriesVMOutput, Never> {
         input.sink { [weak self] inputEvent in
