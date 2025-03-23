@@ -51,7 +51,7 @@ class FeaturedPosterViewCell: UICollectionViewCell {
       }
     
     
-    // MARK: Configure Cell
+    // MARK: Configure Cell with Movie
     func configure(with movie: Movie) {
         guard let posterURL = movie.fullPosterURL else {
             posterImageView.image = UIImage(named: "placeholder") // Eğer URL yoksa varsayılan resim
@@ -60,6 +60,14 @@ class FeaturedPosterViewCell: UICollectionViewCell {
         loadImage(from: posterURL)
     }
     
+    // MARK: Configure Cell with TvSeries
+    func configure(with tv: TvSeries) {
+        guard let posterURL = tv.fullPosterURL else {
+            posterImageView.image = UIImage(named: "placeholder") // Eğer URL yoksa varsayılan resim
+            return
+        }
+        loadImage(from: posterURL)
+    }
     
     // MARK: - URL'den Resim Yükleme
         private func loadImage(from url: String) {
