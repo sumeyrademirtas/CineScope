@@ -5,42 +5,50 @@
 //  Created by Sümeyra Demirtaş on 2/10/25.
 //
 
-import Foundation
 import Combine
+import Foundation
 
 // MARK: - Protocol Definition
+
 protocol TvSeriesUseCase {
-    func fetchAllTvSeries() -> AnyPublisher<(TvSeriesResponse?, TvSeriesResponse?, TvSeriesResponse?, TvSeriesResponse?), Error>?
+    func fetchAllTvSeries() -> AnyPublisher<(TvSeriesResponse?, TvSeriesResponse?, TvSeriesResponse?, TvSeriesResponse?, TvSeriesResponse?), Error>?
 }
 
 struct TvSeriesUseCaseImpl: TvSeriesUseCase {
     private let service: TvSeriesService
     
-    ///Dependency Injection
+    /// Dependency Injection
     init(service: TvSeriesService) {
         self.service = service
     }
     
-    // sira [.airingToday, .onTheAir, .popular, .topRated]
-    func fetchAllTvSeries() -> AnyPublisher<(TvSeriesResponse?, TvSeriesResponse?, TvSeriesResponse?, TvSeriesResponse?), Error>? {
+    func fetchAllTvSeries() -> AnyPublisher<(TvSeriesResponse?, TvSeriesResponse?, TvSeriesResponse?, TvSeriesResponse?, TvSeriesResponse?), Error>? {
         if
+            let trendingPublisher = getTrendingTvSeries(api: .getTrendingTvSeries(page: 1)),
             let airingTodayPublisher = getAiringTodayTvSeries(api: .getAiringTodayTvSeries(page: 1)),
             let onTheAirPublisher = getOnTheAirTvSeries(api: .getOnTheAirTvSeries(page: 1)),
             let popularPublisher = getPopularTvSeries(api: .getPopularTvSeries(page: 1)),
             let topRatedPublisher = getTopRatedTvSeries(api: .getTopRatedTvSeries(page: 1))
         {
-            return Publishers.Zip4(airingTodayPublisher, onTheAirPublisher, popularPublisher, topRatedPublisher)
-                .map { airing, onTheAir, popular, topRated in (airing, onTheAir, popular, topRated)
-                }
-                .eraseToAnyPublisher()
+            return Publishers.Zip(
+                Publishers.Zip4(trendingPublisher, airingTodayPublisher, onTheAirPublisher, popularPublisher),
+                topRatedPublisher
+            )
+            .map { tuple, topRated in
+                let (trending, airingToday, onTheAir, popular) = tuple
+                return (trending, airingToday, onTheAir, popular, topRated)
+            }
+            .eraseToAnyPublisher()
         }
         return nil
-            
     }
 }
 
-
 extension TvSeriesUseCaseImpl {
+    func getTrendingTvSeries(api: TvSeriesApi) -> AnyPublisher<TvSeriesResponse?, any Error>? {
+        service.getTrendingTvSeries(api: api)
+    }
+    
     func getAiringTodayTvSeries(api: TvSeriesApi) -> AnyPublisher<TvSeriesResponse?, any Error>? {
         service.getAiringToday(api: api)
     }
@@ -56,6 +64,4 @@ extension TvSeriesUseCaseImpl {
     func getTopRatedTvSeries(api: TvSeriesApi) -> AnyPublisher<TvSeriesResponse?, any Error>? {
         service.getTopRatedTvSeries(api: api)
     }
-    
-    
 }
