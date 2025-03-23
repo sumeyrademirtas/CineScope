@@ -7,14 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		814DCDFB2D8333D0009A248C /* favorite.json in Resources */ = {isa = PBXBuildFile; fileRef = 814DCDFA2D8333D0009A248C /* favorite.json */; };
+		814DCE232D8335F3009A248C /* CineScopeDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 814DCE212D8335F3009A248C /* CineScopeDataModel.xcdatamodeld */; };
+		814DCE262D83413A009A248C /* FavoriteItem+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 814DCE242D83413A009A248C /* FavoriteItem+CoreDataClass.swift */; };
+		814DCE272D83413A009A248C /* FavoriteItem+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 814DCE252D83413A009A248C /* FavoriteItem+CoreDataProperties.swift */; };
 		815973802D4A659400B5ED20 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 8159737F2D4A659400B5ED20 /* Moya */; };
 		815974AD2D567DEF00B5ED20 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 815974AC2D567DEF00B5ED20 /* Lottie */; };
 		815974B62D5680B300B5ED20 /* progress.json in Resources */ = {isa = PBXBuildFile; fileRef = 815974B52D5680B300B5ED20 /* progress.json */; };
+		81D002AB2D8C11FA00B06B5F /* splashlottie.json in Resources */ = {isa = PBXBuildFile; fileRef = 81D002AA2D8C11FA00B06B5F /* splashlottie.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		814DCDFA2D8333D0009A248C /* favorite.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = favorite.json; sourceTree = "<group>"; };
+		814DCE222D8335F3009A248C /* CineScopeDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CineScopeDataModel.xcdatamodel; sourceTree = "<group>"; };
+		814DCE242D83413A009A248C /* FavoriteItem+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FavoriteItem+CoreDataClass.swift"; sourceTree = "<group>"; };
+		814DCE252D83413A009A248C /* FavoriteItem+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FavoriteItem+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		815973512D4A5F5500B5ED20 /* CineScope.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CineScope.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		815974B52D5680B300B5ED20 /* progress.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = progress.json; sourceTree = "<group>"; };
+		81D002AA2D8C11FA00B06B5F /* splashlottie.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = splashlottie.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -54,7 +64,12 @@
 		815973482D4A5F5500B5ED20 = {
 			isa = PBXGroup;
 			children = (
+				814DCE242D83413A009A248C /* FavoriteItem+CoreDataClass.swift */,
+				814DCE252D83413A009A248C /* FavoriteItem+CoreDataProperties.swift */,
+				814DCE212D8335F3009A248C /* CineScopeDataModel.xcdatamodeld */,
 				815974B52D5680B300B5ED20 /* progress.json */,
+				81D002AA2D8C11FA00B06B5F /* splashlottie.json */,
+				814DCDFA2D8333D0009A248C /* favorite.json */,
 				815973532D4A5F5500B5ED20 /* CineScope */,
 				815973522D4A5F5500B5ED20 /* Products */,
 			);
@@ -138,7 +153,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				814DCDFB2D8333D0009A248C /* favorite.json in Resources */,
 				815974B62D5680B300B5ED20 /* progress.json in Resources */,
+				81D002AB2D8C11FA00B06B5F /* splashlottie.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -149,6 +166,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				814DCE262D83413A009A248C /* FavoriteItem+CoreDataClass.swift in Sources */,
+				814DCE272D83413A009A248C /* FavoriteItem+CoreDataProperties.swift in Sources */,
+				814DCE232D8335F3009A248C /* CineScopeDataModel.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -384,6 +404,19 @@
 			productName = Lottie;
 		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		814DCE212D8335F3009A248C /* CineScopeDataModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				814DCE222D8335F3009A248C /* CineScopeDataModel.xcdatamodel */,
+			);
+			currentVersion = 814DCE222D8335F3009A248C /* CineScopeDataModel.xcdatamodel */;
+			path = CineScopeDataModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 815973492D4A5F5500B5ED20 /* Project object */;
 }
