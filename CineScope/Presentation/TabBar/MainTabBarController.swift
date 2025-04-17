@@ -30,13 +30,22 @@ class MainTabBarController: UITabBarController {
             tag: 1
         )
         
+        // Category tab
+        let categoryBuilder = CategoryBuilderImpl()
+        let categoryVC = categoryBuilder.build()
+        categoryVC.tabBarItem = UITabBarItem(
+            title: "Categories",
+            image: UIImage(systemName: "square.grid.2x2.fill"),
+            tag: 2
+        )
+        
         // Search tabi
         let searchBuilder = SearchBuilderImpl()
         let searchVC = searchBuilder.build()
         searchVC.tabBarItem = UITabBarItem(
             title: "Search",
             image: UIImage(systemName: "magnifyingglass"),
-            tag: 2
+            tag: 3
         )
         
         // Favorites tab
@@ -45,11 +54,13 @@ class MainTabBarController: UITabBarController {
         favoritesVC.tabBarItem = UITabBarItem(
             title: "Favorites",
             image: UIImage(systemName: "heart.fill"),
-            tag: 3
+            tag: 4
         )
+        
+
 
                
         // TabBarController'ın viewControllers'ını ayarlıyoruz.
-        viewControllers = [moviesVC, tvSeriesVC, searchVC, favoritesVC]
+        viewControllers = [moviesVC, tvSeriesVC, categoryVC, searchVC, favoritesVC]
     }
 }
